@@ -337,6 +337,8 @@ const game = {
 // --- ACTIONS ---
 const actions = {
     job: function() {
+        if(state.age < 16) return ui.showPopup("Too Young", "You must be at least 16 to work!", [{text:"Okay", action:null}]);
+        
         let jobs = [
             { name: "Janitor", salary: 20000 },
             { name: "Barista", salary: 25000 },
@@ -374,6 +376,7 @@ const actions = {
     },
 
     doUniversity: function() {
+        if(state.age < 18) return game.log("❌ You must be at least 18 for university!", "bad");
         if(state.money < 30000) return game.log("❌ Not enough money!", "bad");
         const outcomes = [
             () => { state.money -= 30000; state.smarts += 25; state.fame += 5; game.log("🎓 Graduated with honors! +25 Smarts, +5 Fame", "good"); },
@@ -435,6 +438,7 @@ const actions = {
     },
     
     crime: function() {
+        if(state.age < 16) return ui.showPopup("Too Young", "You must be at least 16 to commit crimes!", [{text:"Okay", action:null}]);
         ui.showPopup("Crime", "What's your move?", [
             { text: "Rob House", action: () => { this.doRob(); }},
             { text: "Pickpocket", action: () => { this.doPickpocket(); }},
@@ -537,6 +541,7 @@ const actions = {
     },
 
     doParty: function() {
+        if(state.age < 16) return game.log("❌ Too young to party! Come back at 16.", "bad");
         const outcomes = [
             () => { state.happiness += 20; state.health -= 5; game.log("🎉 Epic party! Everyone was dancing! +20 Happy", "good"); },
             () => { state.happiness += 15; game.log("🎊 Great music and friends! +15 Happy", "good"); },
@@ -589,6 +594,7 @@ const actions = {
     },
 
     doPlasticSurgery: function() {
+        if(state.age < 18) return game.log("❌ You must be at least 18 for plastic surgery!", "bad");
         if(state.money < 5000) return game.log("❌ Not enough money!", "bad");
         const outcomes = [
             () => { state.money -= 5000; state.looks = 100; state.happiness += 30; game.log("✨ You look absolutely stunning! +30 Happy, Looks: MAX", "good"); },
@@ -606,6 +612,7 @@ const actions = {
     },
 
     doTherapy: function() {
+        if(state.age < 13) return game.log("❌ You must be at least 13 for therapy!", "bad");
         if(state.money < 2000) return game.log("❌ Not enough money!", "bad");
         const outcomes = [
             () => { state.money -= 2000; state.happiness = 100; game.log("😌 Feel so much better! Problems solved! +100 Happy", "good"); },
