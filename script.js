@@ -17,7 +17,9 @@ const state = {
     license: null,
     alive: true,
     retired: false,
-    history: []
+    history: [],
+    eventQueue: [],
+    processingEvents: false
 };
 
 // --- CORE ENGINE ---
@@ -82,174 +84,327 @@ const game = {
     },
 
     randomEvents: function() {
-        if (state.age === 6) this.log("🎒 Started Elementary School.", "good");
-        if (state.age === 18) this.log("🎓 Graduated High School.", "good");
+        state.eventQueue = [];
+        
+        if (state.age === 6) state.eventQueue.push({text: "🎒 Started Elementary School.", type: "good"});
+        if (state.age === 18) state.eventQueue.push({text: "🎓 Graduated High School.", type: "good"});
         
         // Milestone birthdays
-        if (state.age === 21) this.log("🎉 You're officially an adult! Time to party!", "good");
-        if (state.age === 30) this.log("📊 Halfway through your 30s! Reflect on your journey.", "neutral");
-        if (state.age === 50) this.log("🎂 You hit the big 5-0! Still got it!", "good");
+        if (state.age === 21) state.eventQueue.push({text: "🎉 You're officially an adult! Time to party!", type: "good"});
+        if (state.age === 30) state.eventQueue.push({text: "📊 Halfway through your 30s! Reflect on your journey.", type: "neutral"});
+        if (state.age === 50) state.eventQueue.push({text: "🎂 You hit the big 5-0! Still got it!", type: "good"});
         
-        // Financial events - EACH HAS ITS OWN RANDOM CHECK NOW
-        if (Math.random() < 0.04 && state.age > 30) {
-            let inheritance = Math.floor(Math.random() * 50000) + 10000;
-            state.money += inheritance;
-            this.log(`💰 A relative left you $${inheritance} in their will!`, "good");
+        // Create array of possible events with probabilities
+        const possibleEvents = [
+            {
+                chance: 0.04,
+                condition: state.age > 30,
+                effect: () => {
+                    let inheritance = Math.floor(Math.random() * 50000) + 10000;
+                    state.money += inheritance;
+                    return `💰 A relative left you $${inheritance} in their will!`;
+                },
+                type: "good"
+            },
+            {
+                chance: 0.03,
+                condition: true,
+                effect: () => {
+                    let lottery = Math.floor(Math.random() * 100000) + 50000;
+                    state.money += lottery;
+                    return `🎰 Won lottery! +$${lottery}!`;
+                },
+                type: "good"
+            },
+            {
+                chance: 0.05,
+                condition: true,
+                effect: () => {
+                    let loss = Math.floor(Math.random() * 5000) + 1000;
+                    state.money -= loss;
+                    return `💸 Got pickpocketed! Lost $${loss}`;
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.03,
+                condition: true,
+                effect: () => {
+                    state.money -= 2000;
+                    return "⚖️ Paid unexpected legal fees -$2000";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.07,
+                condition: true,
+                effect: () => {
+                    state.health -= 15;
+                    return "🚗 Car accident! -15 Health";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.05,
+                condition: true,
+                effect: () => {
+                    state.health -= 10;
+                    return "🤒 Got the flu! -10 Health";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.04,
+                condition: true,
+                effect: () => {
+                    state.health += 20;
+                    return "💪 Started an exercise routine! +20 Health";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.03,
+                condition: true,
+                effect: () => {
+                    state.health -= 20;
+                    state.money -= 5000;
+                    return "🏥 Emergency hospital visit! -20 Health, -$5000";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.02,
+                condition: true,
+                effect: () => {
+                    state.health += 10;
+                    return "😊 Feeling great today! +10 Health";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.06,
+                condition: true,
+                effect: () => {
+                    state.happiness += 15;
+                    return "🎊 Great day at work! +15 Happiness";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.05,
+                condition: true,
+                effect: () => {
+                    state.happiness -= 15;
+                    return "😞 Had a terrible day... -15 Happiness";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.04,
+                condition: true,
+                effect: () => {
+                    state.happiness += 10;
+                    return "🎬 Watched a great movie! +10 Happiness";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.03,
+                condition: true,
+                effect: () => {
+                    state.happiness -= 20;
+                    return "💔 Relationship drama... -20 Happiness";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.04,
+                condition: true,
+                effect: () => {
+                    state.fame += 5;
+                    return "📸 Went viral on social media! +5 Fame";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.03,
+                condition: true,
+                effect: () => {
+                    state.fame += 10;
+                    state.happiness += 20;
+                    return "🌟 Became famous! +10 Fame, +20 Happiness";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.02,
+                condition: true,
+                effect: () => {
+                    state.fame -= 5;
+                    return "😬 Embarrassing incident... -5 Fame";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.03,
+                condition: true,
+                effect: () => {
+                    state.smarts += 5;
+                    return "📚 Learned something new today! +5 Smarts";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.03,
+                condition: true,
+                effect: () => {
+                    state.looks += 3;
+                    return "💇 Got a makeover! +3 Looks";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.08,
+                condition: state.partner && state.age > 25 && state.kids < 3,
+                effect: () => {
+                    state.kids++;
+                    state.happiness += 30;
+                    state.money -= 5000;
+                    return "👶 You had a baby! +30 Happiness, -$5000";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.02,
+                condition: state.partner,
+                effect: () => {
+                    state.happiness += 20;
+                    return "💕 Romantic anniversary with " + state.partner + "! +20 Happiness";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.02,
+                condition: state.partner,
+                effect: () => {
+                    state.partner = null;
+                    state.happiness -= 30;
+                    return "💔 Relationship ended! -30 Happiness";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.02,
+                condition: true,
+                effect: () => {
+                    state.money += 1000;
+                    return "🎁 Found $1000 on the street!";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.02,
+                condition: true,
+                effect: () => {
+                    state.happiness += 25;
+                    return "🎉 Got invited to an amazing party! +25 Happiness";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.01,
+                condition: true,
+                effect: () => {
+                    let winnings = Math.floor(Math.random() * 20000) + 10000;
+                    state.money += winnings;
+                    return "🏆 Won a competition! +$" + winnings;
+                },
+                type: "good"
+            },
+            {
+                chance: 0.02,
+                condition: true,
+                effect: () => {
+                    state.happiness += 5;
+                    return "🐱 A stray cat followed you home today!";
+                },
+                type: "neutral"
+            },
+            {
+                chance: 0.015,
+                condition: true,
+                effect: () => {
+                    state.money -= 500;
+                    return "🐝 Got stung by a bee! -$500 for medical care";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.025,
+                condition: true,
+                effect: () => {
+                    state.smarts -= 5;
+                    state.happiness -= 10;
+                    return "😵 Got too drunk last night! -5 Smarts, -10 Happiness";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.02,
+                condition: true,
+                effect: () => {
+                    state.health += 15;
+                    return "🧘 Meditation and yoga session! +15 Health";
+                },
+                type: "good"
+            },
+            {
+                chance: 0.015,
+                condition: true,
+                effect: () => {
+                    state.happiness -= 10;
+                    return "📱 Spent too much time on social media... -10 Happiness";
+                },
+                type: "bad"
+            },
+            {
+                chance: 0.02,
+                condition: true,
+                effect: () => {
+                    state.money += 500;
+                    return "💼 Got a bonus at work! +$500";
+                },
+                type: "good"
+            }
+        ];
+        
+        // Roll for events that trigger
+        let triggeredEvents = [];
+        for (let event of possibleEvents) {
+            if (event.condition && Math.random() < event.chance) {
+                triggeredEvents.push({
+                    text: event.effect(),
+                    type: event.type
+                });
+            }
         }
         
-        if (Math.random() < 0.03) {
-            let lottery = Math.floor(Math.random() * 100000) + 50000;
-            state.money += lottery;
-            this.log(`🎰 Won lottery! +$${lottery}!`, "good");
+        // Limit to 0-2 random events per age (not counting milestones)
+        if (triggeredEvents.length > 2) {
+            // Shuffle and take top 2
+            for (let i = triggeredEvents.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [triggeredEvents[i], triggeredEvents[j]] = [triggeredEvents[j], triggeredEvents[i]];
+            }
+            triggeredEvents = triggeredEvents.slice(0, 2);
         }
         
-        if (Math.random() < 0.05) {
-            let loss = Math.floor(Math.random() * 5000) + 1000;
-            state.money -= loss;
-            this.log(`💸 Got pickpocketed! Lost $${loss}`, "bad");
-        }
+        // Add triggered events to queue
+        state.eventQueue.push(...triggeredEvents);
         
-        if (Math.random() < 0.03) {
-            state.money -= 2000;
-            this.log("⚖️ Paid unexpected legal fees -$2000", "bad");
-        }
-        
-        // Health events
-        if (Math.random() < 0.07) {
-            state.health -= 15;
-            this.log("🚗 Car accident! -15 Health", "bad");
-        }
-        
-        if (Math.random() < 0.05) {
-            state.health -= 10;
-            this.log("🤒 Got the flu! -10 Health", "bad");
-        }
-        
-        if (Math.random() < 0.04) {
-            state.health += 20;
-            this.log("💪 Started an exercise routine! +20 Health", "good");
-        }
-        
-        if (Math.random() < 0.03) {
-            state.health -= 20;
-            state.money -= 5000;
-            this.log("🏥 Emergency hospital visit! -20 Health, -$5000", "bad");
-        }
-        
-        if (Math.random() < 0.02) {
-            state.health += 10;
-            this.log("😊 Feeling great today! +10 Health", "good");
-        }
-        
-        // Happiness events
-        if (Math.random() < 0.06) {
-            state.happiness += 15;
-            this.log("🎊 Great day at work! +15 Happiness", "good");
-        }
-        
-        if (Math.random() < 0.05) {
-            state.happiness -= 15;
-            this.log("😞 Had a terrible day... -15 Happiness", "bad");
-        }
-        
-        if (Math.random() < 0.04) {
-            state.happiness += 10;
-            this.log("🎬 Watched a great movie! +10 Happiness", "good");
-        }
-        
-        if (Math.random() < 0.03) {
-            state.happiness -= 20;
-            this.log("💔 Relationship drama... -20 Happiness", "bad");
-        }
-        
-        // Fame events
-        if (Math.random() < 0.04) {
-            state.fame += 5;
-            this.log("📸 Went viral on social media! +5 Fame", "good");
-        }
-        
-        if (Math.random() < 0.03) {
-            state.fame += 10;
-            state.happiness += 20;
-            this.log("🌟 Became famous! +10 Fame, +20 Happiness", "good");
-        }
-        
-        if (Math.random() < 0.02) {
-            state.fame -= 5;
-            this.log("😬 Embarrassing incident... -5 Fame", "bad");
-        }
-        
-        // Stat events
-        if (Math.random() < 0.03) {
-            state.smarts += 5;
-            this.log("📚 Learned something new today! +5 Smarts", "good");
-        }
-        
-        if (Math.random() < 0.03) {
-            state.looks += 3;
-            this.log("💇 Got a makeover! +3 Looks", "good");
-        }
-        
-        // Family events
-        if (state.partner && state.age > 25 && Math.random() < 0.08 && state.kids < 3) {
-            state.kids++;
-            state.happiness += 30;
-            state.money -= 5000;
-            this.log(`👶 You had a baby! +30 Happiness, -$5000`, "good");
-        }
-        
-        if (state.partner && Math.random() < 0.02) {
-            state.happiness += 20;
-            this.log("💕 Romantic anniversary with " + state.partner + "! +20 Happiness", "good");
-        }
-        
-        if (state.partner && Math.random() < 0.02) {
-            state.partner = null;
-            state.happiness -= 30;
-            this.log("💔 Relationship ended! -30 Happiness", "bad");
-        }
-        
-        // Surprise events
-        if (Math.random() < 0.02) {
-            state.money += 1000;
-            this.log("🎁 Found $1000 on the street!", "good");
-        }
-        
-        if (Math.random() < 0.02) {
-            state.happiness += 25;
-            this.log("🎉 Got invited to an amazing party! +25 Happiness", "good");
-        }
-        
-        if (Math.random() < 0.01) {
-            let winnings = Math.floor(Math.random() * 20000) + 10000;
-            state.money += winnings;
-            this.log("🏆 Won a competition! +$" + winnings, "good");
-        }
-        
-        if (Math.random() < 0.02) {
-            this.log("🐱 A stray cat followed you home today!", "neutral");
-            state.happiness += 5;
-        }
-        
-        if (Math.random() < 0.015) {
-            state.money -= 500;
-            this.log("🐝 Got stung by a bee! -$500 for medical care", "bad");
-        }
-        
-        if (Math.random() < 0.025) {
-            state.smarts -= 5;
-            state.happiness -= 10;
-            this.log("😵 Got too drunk last night! -5 Smarts, -10 Happiness", "bad");
-        }
-        
-        if (Math.random() < 0.02) {
-            state.health += 15;
-            this.log("🧘 Meditation and yoga session! +15 Health", "good");
-        }
-        
-        if (Math.random() < 0.015) {
-            state.money += 5000;
-            this.log("💼 Got a work bonus! +$5000", "good");
+        // Process queue (log events immediately, but max 2 per age)
+        for (let event of state.eventQueue) {
+            this.log(event.text, event.type);
         }
     },
 
