@@ -533,11 +533,15 @@ const ui = {
         entry.innerHTML = `<b>${state.age}y:</b> ${text}`;
         logBox.appendChild(entry);
         
-        // Limit log entries to 50 to prevent overflow
+        // Limit log entries to 30 to keep it snappy
         const entries = logBox.querySelectorAll('.log-entry');
-        if (entries.length > 50) {
+        while (entries.length > 30) {
             entries[0].remove();
+            entries = logBox.querySelectorAll('.log-entry');
         }
+        
+        // Auto-scroll to bottom immediately
+        logBox.scrollTop = logBox.scrollHeight;
         
         this.playSound();
     },
