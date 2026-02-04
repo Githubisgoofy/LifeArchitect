@@ -366,59 +366,122 @@ const actions = {
     },
 
     school: function() {
-        ui.showPopup("Education", "University costs $30,000.", [
-            { text: "Enroll ($30k)", action: () => {
-                if(state.money >= 30000) { 
-                    state.money -= 30000; 
-                    state.smarts += 20; 
-                    game.log("Enrolled in University.", "good"); 
-                } else { 
-                    game.log("Too poor for school.", "bad"); 
-                }
-            }},
-            { text: "Study Hard (Free)", action: () => { state.smarts += 5; game.log("You studied hard."); } },
+        ui.showPopup("Education", "What to study?", [
+            { text: "Enroll University ($30k)", action: () => { this.doUniversity(); }},
+            { text: "Study Hard (Free)", action: () => { this.doStudy(); }},
             { text: "Cancel", action: null }
         ]);
+    },
+
+    doUniversity: function() {
+        if(state.money < 30000) return game.log("❌ Not enough money!", "bad");
+        const outcomes = [
+            () => { state.money -= 30000; state.smarts += 25; state.fame += 5; game.log("🎓 Graduated with honors! +25 Smarts, +5 Fame", "good"); },
+            () => { state.money -= 30000; state.smarts += 15; game.log("📚 Got your degree! +15 Smarts", "good"); },
+            () => { state.money -= 30000; state.smarts += 10; state.happiness -= 30; game.log("😫 Finished but miserable. +10 Smarts, -30 Happy", "neutral"); },
+            () => { state.money -= 30000; state.smarts -= 5; game.log("🤦 Dropped out after first semester. -5 Smarts", "bad"); },
+            () => { state.money -= 30000; state.smarts += 30; state.fame += 10; game.log("🌟 Top of your class! Legendary! +30 Smarts, +10 Fame", "good"); },
+            () => { state.money -= 30000; state.smarts += 20; state.partner = "College Sweetheart"; state.happiness += 30; game.log("💕 Met your soulmate! +20 Smarts, +30 Happy", "good"); },
+            () => { state.money -= 30000; state.smarts += 8; state.health -= 20; game.log("🤒 Got sick freshman year. +8 Smarts, -20 Health", "neutral"); },
+            () => { state.money -= 30000; state.smarts += 12; state.looks += 3; game.log("💪 Fit and smart! +12 Smarts, +3 Looks", "good"); },
+            () => { state.money -= 30000; state.smarts += 18; state.money += 50000; game.log("💼 Great internship! Got job offer! +18 Smarts, +$50k", "good"); },
+            () => { state.money -= 30000; state.smarts += 14; state.happiness += 15; game.log("👥 Made lifelong friends! +14 Smarts, +15 Happy", "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
+    },
+
+    doStudy: function() {
+        const outcomes = [
+            () => { state.smarts += 10; state.health -= 5; game.log("📖 Studied hard. Eyes sore. +10 Smarts, -5 Health", "good"); },
+            () => { state.smarts += 8; game.log("✏️ Got some studying done. +8 Smarts", "good"); },
+            () => { state.smarts += 3; state.happiness -= 20; game.log("😫 Studied but couldn't focus. +3 Smarts, -20 Happy", "bad"); },
+            () => { state.smarts += 15; state.happiness += 10; game.log("🧠 Felt so smart! +15 Smarts, +10 Happy", "good"); },
+            () => { state.smarts += 1; game.log("😴 Fell asleep while studying. +1 Smarts", "bad"); },
+            () => { state.smarts += 12; state.fame += 2; game.log("⭐ Became known as the smart kid! +12 Smarts, +2 Fame", "good"); },
+            () => { state.smarts += 7; state.health += 5; game.log("🧘 Studied with peaceful mind. +7 Smarts, +5 Health", "good"); },
+            () => { state.smarts += 20; state.looks -= 5; game.log("🤓 Super focused! Looks neglected. +20 Smarts, -5 Looks", "neutral"); },
+            () => { state.smarts -= 2; game.log("🎮 Got distracted by games. -2 Smarts", "bad"); },
+            () => { state.smarts += 9; state.happiness += 8; game.log("📝 Productive session! +9 Smarts, +8 Happy", "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
     },
 
     love: function() {
         if(state.age < 16) return ui.showPopup("Too Young", "Wait until you are 16.", [{text:"Okay", action:null}]);
         
-        let names = ["Alex", "Sam", "Jordan", "Casey", "Riley"];
+        let names = ["Alex", "Sam", "Jordan", "Casey", "Riley", "Morgan", "Taylor", "Quinn"];
         let lover = { name: names[Math.floor(Math.random() * names.length)], look: Math.floor(Math.random()*100) };
         
         ui.showPopup("Dating App", `Matched with ${lover.name}. Looks: ${lover.look}%`, [
-            { text: "Ask Out 💘", action: () => { 
-                if (Math.random() > 0.4) {
-                    state.partner = lover;
-                    state.happiness += 20;
-                    game.log(`Dating ${lover.name}!`, "good");
-                } else {
-                    game.log(`${lover.name} rejected you.`, "bad");
-                }
-            }},
+            { text: "Ask Out 💘", action: () => { this.doAskOut(lover); }},
             { text: "Swipe Left ❌", action: () => { game.log("You stayed single."); } }
         ]);
+    },
+
+    doAskOut: function(lover) {
+        const outcomes = [
+            () => { state.partner = lover.name; state.happiness += 25; game.log(`✨ ${lover.name} said YES! Congrats! +25 Happy`, "good"); },
+            () => { state.partner = lover.name; state.happiness += 20; game.log(`💕 ${lover.name} is your partner now! +20 Happy`, "good"); },
+            () => { state.happiness -= 15; game.log(`😢 ${lover.name} rejected you. -15 Happy`, "bad"); },
+            () => { state.happiness -= 25; game.log(`😳 ${lover.name} blocked you! -25 Happy`, "bad"); },
+            () => { state.partner = lover.name; state.happiness += 30; state.fame += 3; game.log(`🌟 ${lover.name} thinks you're amazing! +30 Happy, +3 Fame`, "good"); },
+            () => { state.happiness -= 10; game.log(`😕 ${lover.name} said maybe later... -10 Happy`, "bad"); },
+            () => { state.partner = lover.name; state.happiness += 15; game.log(`😊 ${lover.name} gave you a chance. +15 Happy`, "good"); },
+            () => { state.happiness -= 30; state.looks -= 2; game.log(`😲 Humiliating rejection! -30 Happy, -2 Looks`, "bad"); },
+            () => { state.partner = lover.name; state.happiness += 22; state.smarts -= 5; game.log(`🎉 Love makes you dumb but happy! ${lover.name} ❤️`, "good"); },
+            () => { state.health += 10; state.happiness += 35; state.partner = lover.name; game.log(`🚀 Life-changing romance! +35 Happy, +10 Health`, "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
     },
     
     crime: function() {
         ui.showPopup("Crime", "What's your move?", [
-            { text: "Rob House", action: () => {
-                if(Math.random() > 0.5) { 
-                    state.money += 10000; 
-                    game.log("Stole $10,000!", "good"); 
-                } else { 
-                    state.happiness -= 30; 
-                    state.job = "Unemployed";
-                    game.log("Caught! Prison time & fired.", "bad"); 
-                }
-            }},
-            { text: "Pickpocket", action: () => {
-                state.money += 500; 
-                game.log("Pickpocketed $500.");
-            }},
+            { text: "Rob House", action: () => { this.doRob(); }},
+            { text: "Pickpocket", action: () => { this.doPickpocket(); }},
             { text: "Cancel", action: null }
         ]);
+    },
+
+    doRob: function() {
+        const outcomes = [
+            () => { state.money += 10000; game.log("💰 Robbed a mansion! +$10,000!", "good"); },
+            () => { state.money += 5000; game.log("💼 Broke into an apartment! +$5,000", "good"); },
+            () => { state.money -= 5000; state.happiness -= 30; state.job = "Unemployed"; game.log("🚨 Caught immediately! Prison time & fired! -$5000, -30 Happy", "bad"); },
+            () => { state.health -= 20; game.log("🔫 Got shot by security! -20 Health", "bad"); },
+            () => { state.money += 20000; state.fame += 10; game.log("🌟 Pulled off the heist of the century! +$20,000, +10 Fame", "good"); },
+            () => { state.money += 1000; game.log("😒 Only found $1000. Weak haul. +$1000", "neutral"); },
+            () => { state.health -= 5; state.money += 3000; game.log("🚪 Got into a fight but escaped! +$3000, -5 Health", "neutral"); },
+            () => { state.money -= 10000; state.happiness -= 50; game.log("😱 Set off alarm and got arrested! Fine: -$10,000, -50 Happy", "bad"); },
+            () => { state.money += 15000; state.happiness += 20; game.log("😎 Smooth criminal. +$15,000, +20 Happy", "good"); },
+            () => { state.smarts -= 10; game.log("🤦 Got caught on camera by your own dumb mistake. Arrested!", "bad"); },
+            () => { state.money += 7500; game.log("🎯 Targeted house was worth it! +$7,500", "good"); },
+            () => { state.health -= 10; state.money += 8000; game.log("🥊 Brutal fight but won the loot! +$8000, -10 Health", "neutral"); },
+            () => { state.money += 2000; state.fame += 3; game.log("🦸 Legendary criminal! +$2000, +3 Fame", "good"); },
+            () => { state.health -= 25; game.log("💀 Nearly died during robbery! -25 Health", "bad"); },
+            () => { state.money += 12000; state.looks += 2; game.log("💎 Stole valuable jewels! +$12,000, +2 Looks", "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
+    },
+
+    doPickpocket: function() {
+        const outcomes = [
+            () => { state.money += 500; game.log("👜 Pickpocketed $500. Smooth.", "good"); },
+            () => { state.money += 1000; game.log("💼 Got a fat wallet! +$1000", "good"); },
+            () => { state.money -= 200; state.happiness -= 20; game.log("😬 Caught! Had to pay them back + fine. -$200, -20 Happy", "bad"); },
+            () => { state.money += 200; game.log("🎒 Only got $200. Not worth it.", "neutral"); },
+            () => { state.fame += 2; state.money += 750; game.log("🕵️ Legendary pickpocket! +$750, +2 Fame", "good"); },
+            () => { state.money -= 500; game.log("👮 Got chased by police! Had to drop everything. -$500", "bad"); },
+            () => { state.money += 300; state.happiness -= 10; game.log("😰 Got $300 but paranoid now. -10 Happy", "neutral"); },
+            () => { state.money += 2000; game.log("🍀 Hit jackpot! +$2000!", "good"); },
+            () => { state.health -= 5; state.money += 600; game.log("👊 Got punched but kept the money! +$600, -5 Health", "neutral"); },
+            () => { state.money -= 1000; game.log("🚨 Arrested! Spent $1000 on bail. -$1000", "bad"); },
+            () => { state.money += 800; game.log("💰 Nice score! +$800", "good"); },
+            () => { state.money += 100; game.log("😅 Guy only had $100. Pathetic.", "bad"); },
+            () => { state.smarts += 3; state.money += 1200; game.log("🧠 Used your brain! Perfect execution. +$1200, +3 Smarts", "good"); },
+            () => { state.happiness -= 15; game.log("😔 Felt guilty. Couldn't enjoy it. -15 Happy", "bad"); },
+            () => { state.money += 900; state.fame += 1; game.log("⭐ Street legend! +$900, +1 Fame", "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
     },
 
     assets: function() {
@@ -465,25 +528,99 @@ const actions = {
     
     activities: function() {
         ui.showPopup("Activities", "What to do?", [
-            { text: "Party", action: () => { state.happiness += 10; game.log("Great party! +10 Happy"); } },
-            { text: "Gym", action: () => { state.health += 10; game.log("Worked out. +10 Health"); } },
-            { text: "Plastic Surgery ($5k)", action: () => { 
-                if(state.money>=5000){
-                    state.money-=5000; 
-                    state.looks=100; 
-                    game.log("You look amazing now!", "good");
-                }
-            }},
-            { text: "Therapy ($2k)", action: () => { 
-                if(state.money>=2000){
-                    state.money-=2000; 
-                    state.happiness=100; 
-                    game.log("Feeling much better!", "good");
-                }
-            }},
+            { text: "Party", action: () => { this.doParty(); } },
+            { text: "Gym", action: () => { this.doGym(); } },
+            { text: "Plastic Surgery ($5k)", action: () => { this.doPlasticSurgery(); }},
+            { text: "Therapy ($2k)", action: () => { this.doTherapy(); }},
             { text: "Cancel", action: null }
         ]);
-    }
+    },
+
+    doParty: function() {
+        const outcomes = [
+            () => { state.happiness += 20; state.health -= 5; game.log("🎉 Epic party! Everyone was dancing! +20 Happy", "good"); },
+            () => { state.happiness += 15; game.log("🎊 Great music and friends! +15 Happy", "good"); },
+            () => { state.happiness -= 10; game.log("😢 Party was boring and lame. -10 Happy", "bad"); },
+            () => { state.health -= 10; state.happiness -= 10; game.log("🤮 Got too drunk, terrible hangover. -10 Health/Happy", "bad"); },
+            () => { state.money -= 50; game.log("💸 Lost $50 to drunk gambling", "bad"); },
+            () => { state.happiness += 25; state.fame += 5; game.log("⭐ Everyone wanted to talk to you! +25 Happy, +5 Fame", "good"); },
+            () => { state.smarts -= 5; game.log("🍸 Brain cells lost to shots. -5 Smarts", "bad"); },
+            () => { state.health -= 15; state.happiness += 20; game.log("🎸 Insane mosh pit! Bruised but happy. -15 Health, +20 Happy", "neutral"); },
+            () => { state.looks += 2; game.log("💅 Got compliments on your outfit! +2 Looks", "good"); },
+            () => { state.happiness -= 30; game.log("😳 Awkward situation... wanted to leave immediately. -30 Happy", "bad"); },
+            () => { state.money -= 200; state.happiness -= 20; game.log("🚨 Got arrested for public intoxication! Lost $200, -20 Happy", "bad"); },
+            () => { state.happiness += 30; state.fame += 3; game.log("🎤 Sang karaoke and killed it! +30 Happy, +3 Fame", "good"); },
+            () => { state.health += 5; state.happiness += 10; game.log("🕺 Great dancing session! +5 Health, +10 Happy", "good"); },
+            () => { state.happiness -= 5; game.log("😒 Spent whole time on phone. -5 Happy", "bad"); },
+            () => { state.smarts += 3; state.happiness += 10; game.log("🧠 Met intelligent people, great conversations! +3 Smarts, +10 Happy", "good"); },
+            () => { state.money += 100; game.log("🎰 Won money at beer pong! +$100", "good"); },
+            () => { state.looks -= 3; state.happiness -= 10; game.log("🤕 Face-planted on the dance floor! -3 Looks, -10 Happy", "bad"); },
+            () => { state.happiness += 15; game.log("💃 Danced until 3 AM! +15 Happy", "good"); },
+            () => { state.health -= 8; game.log("🍻 Too much drinking. -8 Health", "bad"); },
+            () => { state.fame += 2; game.log("📸 Got tagged in tons of party pics! +2 Fame", "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
+    },
+
+    doGym: function() {
+        const outcomes = [
+            () => { state.health += 20; state.looks += 2; game.log("💪 Killer workout! Muscles growing! +20 Health, +2 Looks", "good"); },
+            () => { state.health += 15; game.log("🏋️ Good gym session. +15 Health", "good"); },
+            () => { state.health -= 10; state.smarts -= 5; game.log("🤯 Lifted too heavy and injured yourself! -10 Health, -5 Smarts", "bad"); },
+            () => { state.health -= 5; game.log("😫 Sore and exhausted. -5 Health", "bad"); },
+            () => { state.health += 25; state.happiness += 10; game.log("⚡ Best workout ever! Feel amazing! +25 Health, +10 Happy", "good"); },
+            () => { state.health += 10; state.happiness += 5; game.log("😊 Gym cleared your mind. +10 Health, +5 Happy", "good"); },
+            () => { state.money -= 1000; game.log("🏦 Gym membership overcharged you! -$1000", "bad"); },
+            () => { state.looks += 5; state.health += 18; game.log("🔥 Getting shredded! +5 Looks, +18 Health", "good"); },
+            () => { state.health -= 20; game.log("😵 Dehydrated and collapsed! -20 Health", "bad"); },
+            () => { state.happiness += 15; state.health += 10; game.log("😍 Attractive person complimented you! +15 Happy, +10 Health boost", "good"); },
+            () => { state.health += 8; game.log("🚴 Nice cardio session. +8 Health", "good"); },
+            () => { state.health -= 3; game.log("🍎 Forgot to stretch. Minor soreness. -3 Health", "bad"); },
+            () => { state.smarts -= 2; game.log("🤪 Gym bro brain. -2 Smarts", "bad"); },
+            () => { state.fame += 3; game.log("⭐ Gym regulars know you! +3 Fame", "good"); },
+            () => { state.happiness -= 15; game.log("😩 Trainer was a jerk. -15 Happy", "bad"); },
+            () => { state.health += 12; state.looks += 1; game.log("🏃 Sprint workout done! +12 Health, +1 Looks", "good"); },
+            () => { state.money += 50; game.log("💰 Found $50 in locker room! +$50", "good"); },
+            () => { state.health -= 8; state.looks -= 2; game.log("🤢 Threw up during workout. -8 Health, -2 Looks", "bad"); },
+            () => { state.health += 22; state.happiness += 8; game.log("🌟 Broke a personal record! +22 Health, +8 Happy", "good"); },
+            () => { state.happiness += 10; game.log("👥 Made new gym buddies! +10 Happy", "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
+    },
+
+    doPlasticSurgery: function() {
+        if(state.money < 5000) return game.log("❌ Not enough money!", "bad");
+        const outcomes = [
+            () => { state.money -= 5000; state.looks = 100; state.happiness += 30; game.log("✨ You look absolutely stunning! +30 Happy, Looks: MAX", "good"); },
+            () => { state.money -= 5000; state.looks = 95; state.happiness += 25; game.log("💫 Excellent results! +25 Happy", "good"); },
+            () => { state.money -= 5000; state.looks = 75; state.happiness -= 20; game.log("😬 Botched job! Looks worse! -20 Happy", "bad"); },
+            () => { state.money -= 5000; state.looks = 60; state.happiness -= 30; game.log("😱 Terrible surgery! What did they do?! -30 Happy", "bad"); },
+            () => { state.money -= 5000; state.looks = 90; state.happiness += 20; state.fame += 5; game.log("🌟 New look = instant fame! +20 Happy, +5 Fame", "good"); },
+            () => { state.money -= 5000; state.looks = 85; game.log("👍 Decent improvements. +Looks", "good"); },
+            () => { state.money -= 5000; state.health -= 15; state.looks = 80; game.log("🏥 Some complications, but looks great. -15 Health", "neutral"); },
+            () => { state.money -= 5000; state.looks = 92; state.happiness += 25; state.smarts -= 2; game.log("💅 Look amazing but feeling ditzy. -2 Smarts, +25 Happy", "neutral"); },
+            () => { state.money -= 5000; state.looks = 70; game.log("🤷 Okay results. Nothing special.", "neutral"); },
+            () => { state.money -= 5000; state.looks = 88; state.fame += 8; game.log("📸 Red carpet worthy! +8 Fame", "good"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
+    },
+
+    doTherapy: function() {
+        if(state.money < 2000) return game.log("❌ Not enough money!", "bad");
+        const outcomes = [
+            () => { state.money -= 2000; state.happiness = 100; game.log("😌 Feel so much better! Problems solved! +100 Happy", "good"); },
+            () => { state.money -= 2000; state.happiness += 30; game.log("☺️ Great session! Really helped. +30 Happy", "good"); },
+            () => { state.money -= 2000; state.happiness -= 5; game.log("😒 Therapist sucks. -5 Happy", "bad"); },
+            () => { state.money -= 2000; state.happiness += 40; state.smarts += 5; game.log("🧠 Gained real insights about yourself! +40 Happy, +5 Smarts", "good"); },
+            () => { state.money -= 2000; state.happiness -= 20; game.log("😫 Dredged up old trauma. -20 Happy", "bad"); },
+            () => { state.money -= 2000; state.happiness += 20; state.health += 10; game.log("🌟 Mental and physical health improved! +20 Happy, +10 Health", "good"); },
+            () => { state.money -= 2000; game.log("🤐 Therapist didn't say much. No change.", "neutral"); },
+            () => { state.money -= 2000; state.happiness += 25; state.fame -= 2; game.log("💭 Therapist gossiped about you. -2 Fame", "bad"); },
+            () => { state.money -= 2000; state.happiness += 50; game.log("✨ Life-changing session! Everything makes sense now! +50 Happy", "good"); },
+            () => { state.money -= 2000; state.happiness -= 10; state.smarts += 2; game.log("📖 Learned a lot but still sad. -10 Happy, +2 Smarts", "neutral"); }
+        ];
+        outcomes[Math.floor(Math.random() * outcomes.length)]();
+    },
 };
 
 // --- UI HANDLERS ---
