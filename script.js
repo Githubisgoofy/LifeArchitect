@@ -14,6 +14,7 @@ const state = {
     kids: 0,
     pets: [],
     fame: 0,
+    license: null,
     alive: true,
     retired: false,
     history: []
@@ -212,26 +213,42 @@ const actions = {
     },
 
     assets: function() {
-        ui.showPopup("Shopping", "What to buy?", [
-            { text: "Car ($25k)", action: () => { 
-                if(state.money>=25000){
-                    state.money-=25000; 
-                    game.log("Bought a car!");
-                } else game.log("Too poor!", "bad");
+        ui.showPopup("🛍️ Shopping", "What would you like to buy?", [
+            { text: "🎫 Driver's License ($200)", action: () => { 
+                if(state.age < 16) return game.log("Too young for license!", "bad");
+                if(state.license) return game.log("You already have a license!", "bad");
+                if(state.money < 200) return game.log("Not enough money!", "bad");
+                ui.showPopup("Driving Test", "Answer 3 questions correctly to pass!\nYou have a 70% chance.", [
+                    { text: "Take Test", action: () => {
+                        const passed = Math.random() < 0.7;
+                        if(passed) {
+                            state.license = "Driver's License";
+                            state.money -= 200;
+                            game.log("✅ You passed! Got your license! 🎫", "good");
+                        } else {
+                            game.log("❌ Failed the test. Try again later.", "bad");
+                        }
+                    }},
+                    { text: "Cancel", action: null }
+                ]);
             }},
-            { text: "House ($100k)", action: () => { 
-                if(state.money>=100000){
-                    state.money-=100000; 
-                    game.log("Bought a house!", "good");
-                } else game.log("Too poor!", "bad");
+            { text: "🚗 Car ($25k)", action: () => { 
+                if(!state.license) return game.log("❌ You need a driver's license first!", "bad");
+                if(state.money < 25000) return game.log("❌ Not enough money!", "bad");
+                state.money -= 25000; 
+                game.log("Bought a sleek car! 🚗", "good");
             }},
-            { text: "Dog ($2k)", action: () => { 
-                if(state.money>=2000){
-                    state.money-=2000; 
-                    state.pets.push("Dog");
-                    state.happiness += 10;
-                    game.log("Got a dog! +10 Happiness");
-                } else game.log("Too poor!", "bad");
+            { text: "🏠 House ($100k)", action: () => { 
+                if(state.money < 100000) return game.log("❌ Not enough money!", "bad");
+                state.money -= 100000; 
+                game.log("Bought a beautiful house! 🏠", "good");
+            }},
+            { text: "🐕 Dog ($2k)", action: () => { 
+                if(state.money < 2000) return game.log("❌ Not enough money!", "bad");
+                state.money -= 2000; 
+                state.pets.push("Dog");
+                state.happiness += 10;
+                game.log("Got a cute dog! 🐕 +10 Happiness", "good");
             }},
             { text: "Cancel", action: null }
         ]);
@@ -306,6 +323,13 @@ const ui = {
         entry.className = `log-entry ${type}`;
         entry.innerHTML = `<b>${state.age}y:</b> ${text}`;
         logBox.appendChild(entry);
+        
+        // Limit log entries to 50 to prevent overflow
+        const entries = logBox.querySelectorAll('.log-entry');
+        if (entries.length > 50) {
+            entries[0].remove();
+        }
+        
         this.playSound();
     },
 
