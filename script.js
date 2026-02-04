@@ -4,142 +4,203 @@ const state = {
     money: 0,
     health: 100,
     happiness: 100,
+    smarts: Math.floor(Math.random() * 60) + 20,
+    looks: Math.floor(Math.random() * 60) + 20,
+    job: "Unemployed",
+    salary: 0,
+    education: "None",
+    partner: null,  // New: Tracks who you are dating
     alive: true,
-    history: [],
-    job: null,
-    crimes: 0,
-    casinoWins: 0
+    history: []
 };
 
 const game = {
-    init: function() {
-        this.log("You were born. Welcome to the world, " + state.name + ".");
-        ui.render();
-    },
     ageUp: function() {
-        if (!state.alive) return;
+        if (!state.alive) return alert("You are dead. Reload to restart.");
         state.age++;
         
-        // Random Logic
-        let eventRoll = Math.random();
-        if (state.age === 6) this.log("You started Elementary School.");
-        if (state.age === 18) this.log("You graduated High School.");
-        
-        if (eventRoll < 0.1) {
-            state.health -= 10;
-            state.happiness -= 15;
-            this.log("You caught the flu! <span class='red'>-10 Health</span>");
+        // Income
+        if (state.salary > 0) {
+            let tax = Math.floor(state.salary * 0.2);
+            let net = state.salary - tax;
+            state.money += net;
+            this.log(`Earned $${net} from work.`);
         }
-        if (state.age > 18) {
-            state.money -= 100;
-            this.log("Cost of living deduction. <span class='red'>-$100</span>");
+
+        // Relationship Events
+        if (state.partner) {
+            if (Math.random() > 0.8) {
+                state.happiness += 10;
+                this.log(`❤️ You went on a romantic date with ${state.partner.name}.`);
+            }
+            if (Math.random() < 0.05) {
+                this.log(`💔 ${state.partner.name} dumped you!`);
+                state.partner = null;
+                state.happiness -= 30;
+            }
         }
-        if (state.health <= 0) {
-            state.alive = false;
-            this.log("<b class='red'>You have died. Game Over.</b>");
-        }
+
+        // Random Age Events
+        this.randomEvents();
+
+        // Stat Decay
+        if(state.age > 30) state.looks -= 1;
+        if(state.age > 60) state.health -= 2;
+
         ui.render();
+        ui.scrollToBottom();
     },
+
+    randomEvents: function() {
+        const r = Math.random();
+        if (state.age === 6) this.log("🎒 Started Elementary School.");
+        if (state.age === 18) { this.log("🎓 Graduated High School."); state.education = "High School"; }
+        
+        if (r < 0.05) {
+            state.health -= 10;
+            this.log("🤒 You got sick. -10 Health");
+        }
+    },
+
     log: function(msg) {
-        state.history.push({ age: state.age, text: msg });
-        ui.addLog(state.age, msg);
+        state.history.push({age: state.age, txt: msg});
+        ui.addLog(msg);
     }
 };
 
 const actions = {
-    askMoney: function() {
-        if (!state.alive) return;
-        if (state.age < 5) {
-            game.log("You are too young to understand money.");
-            return;
-        }
-        let amount = Math.floor(Math.random() * 50) + 10;
-        state.money += amount;
-        game.log("Your parents gave you $" + amount + ". <span class='green'>+$" + amount + "</span>");
-        ui.render();
-    },
-    workout: function() {
-        if (!state.alive) return;
-        state.health = Math.min(100, state.health + 5);
-        game.log("You had a good workout. <span class='green'>+Health</span>");
-        ui.render();
-    },
-    getJob: function() {
-        if (!state.alive || state.age < 16) {
-            game.log("You must be at least 16 to work.");
-            return;
-        }
-        const jobs = ["Barista", "Cashier", "Developer", "Teacher", "Doctor"];
-        state.job = jobs[Math.floor(Math.random() * jobs.length)];
-        game.log("You got a job as a " + state.job + "! <span class='green'>+Job</span>");
-        ui.render();
-    },
-    work: function() {
-        if (!state.alive || !state.job) {
-            game.log("You need a job to work!");
-            return;
-        }
-        let salary = Math.floor(Math.random() * 500) + 200;
-        state.money += salary;
-        state.happiness -= 5;
-        game.log("You worked as a " + state.job + " and earned $" + salary + ". <span class='green'>+$" + salary + "</span> <span class='red'>-Happy</span>");
-        ui.render();
-    },
-    playCasino: function() {
-        if (!state.alive || state.money < 50) {
-            game.log("You need at least $50 to play casino.");
-            return;
-        }
-        let bet = 50;
-        state.money -= bet;
-        let won = Math.random() < 0.4;
-        if (won) {
-            let winnings = bet * 2;
-            state.money += winnings;
-            state.happiness += 10;
-            state.casinoWins++;
-            game.log("Lucky day! You won $" + winnings + " at the casino! <span class='green'>+$" + winnings + "</span>");
+    school: function() {
+        if(state.education === "University") return game.log("You already have a degree!");
+        if (state.money >= 20000 && confirm("Go to University for $20k?")) {
+            state.money -= 20000;
+            state.education = "University";
+            state.smarts += 15;
+            game.log("🎓 Enrolled in University.");
         } else {
-            state.happiness -= 10;
-            game.log("You lost $" + bet + " at the casino. <span class='red'>-$" + bet + "</span>");
+            game.log("❌ Can't afford tuition.");
         }
         ui.render();
     },
-    commitCrime: function() {
-        if (!state.alive || state.age < 18) {
-            game.log("You're too young for crime.");
-            return;
+
+    job: function() {
+        let choice = prompt("1. Janitor ($15k)\n2. Teacher ($40k, Req: Degree)\n3. Surgeon ($250k, Req: Degree + 90 Smarts)");
+        if (choice === '1') { state.job = "Janitor"; state.salary = 15000; }
+        else if (choice === '2' && state.education === "University") { state.job = "Teacher"; state.salary = 40000; }
+        else if (choice === '3' && state.education === "University" && state.smarts >= 90) { state.job = "Surgeon"; state.salary = 250000; }
+        else { return alert("You didn't get the job."); }
+        game.log(`You were hired as a ${state.job}.`);
+        ui.render();
+    },
+
+    love: function() {
+        if(state.age < 16) return alert("Too young for the dating app.");
+        
+        // If single, find partner
+        if (!state.partner) {
+            let names = ["Sarah", "Jessica", "Emily", "Michael", "David", "Chris", "Ashley", "Amanda"];
+            let randomName = names[Math.floor(Math.random() * names.length)];
+            let randomLooks = Math.floor(Math.random() * 100);
+            let randomSmarts = Math.floor(Math.random() * 100);
+            
+            let choice = confirm(`You found ${randomName} on the Dating App.\nLooks: ${randomLooks}\nSmarts: ${randomSmarts}\n\nAsk them out?`);
+            
+            if (choice) {
+                if (Math.random() > 0.3) {
+                    state.partner = { name: randomName, looks: randomLooks, smarts: randomSmarts, status: "Dating" };
+                    state.happiness += 20;
+                    game.log(`💘 You started dating ${randomName}!`);
+                } else {
+                    state.happiness -= 5;
+                    game.log(`💔 ${randomName} rejected you.`);
+                }
+            }
+        } 
+        // If already dating, propose marriage
+        else if (state.partner.status === "Dating") {
+            if (confirm(`Propose to ${state.partner.name}? (Ring costs $5000)`)) {
+                if (state.money < 5000) return alert("You can't afford a ring!");
+                state.money -= 5000;
+                
+                if (Math.random() > 0.2) {
+                    state.partner.status = "Married";
+                    state.happiness += 50;
+                    game.log(`💍 SHE SAID YES! You are now married to ${state.partner.name}.`);
+                } else {
+                    state.happiness -= 30;
+                    state.partner = null;
+                    game.log(`💔 Proposal rejected! She broke up with you.`);
+                }
+            }
         }
-        let caught = Math.random() < 0.5;
-        if (!caught) {
-            let loot = Math.floor(Math.random() * 1000) + 500;
-            state.money += loot;
-            state.crimes++;
-            state.happiness += 15;
-            game.log("You committed a crime and got away with $" + loot + "! <span class='green'>+$" + loot + "</span> <span class='red'>Crimes: " + state.crimes + "</span>");
-        } else {
-            state.health -= 20;
-            state.money = Math.max(0, state.money - 500);
-            game.log("You got caught! Police took your money and beat you up. <span class='red'>-$500 -20 Health</span>");
+        else {
+            alert(`You are happily married to ${state.partner.name}.`);
         }
         ui.render();
+    },
+
+    crime: function() {
+        if (Math.random() > 0.6) {
+            game.log("👮 You were caught! Went to jail.");
+            state.job = "Unemployed";
+            state.salary = 0;
+        } else {
+            let stolen = Math.floor(Math.random() * 1000) + 100;
+            state.money += stolen;
+            game.log(`🔫 Stole $${stolen}.`);
+        }
+        ui.render();
+    },
+    
+    casino: function() {
+        let bet = prompt("Bet amount:");
+        bet = parseInt(bet);
+        if (bet > state.money) return;
+        if (Math.random() > 0.5) { state.money += bet; game.log(`🎰 Won $${bet}!`); }
+        else { state.money -= bet; game.log(`🎰 Lost $${bet}.`); }
+        ui.render();
+    },
+
+    doctor: function() {
+        state.money -= 500; state.health = 100; game.log("🏥 Cured by doctor."); ui.render();
+    },
+    
+    assets: function() {
+         if(state.money >= 100000 && confirm("Buy Condo ($100k)?")) {
+             state.money -= 100000; game.log("🏠 Bought a Condo!");
+         }
+         ui.render();
+    },
+
+    profile: function() {
+        let pText = state.partner ? `${state.partner.name} (${state.partner.status})` : "Single";
+        alert(`Name: ${state.name}\nJob: ${state.job}\nStatus: ${pText}`);
     }
 };
 
 const ui = {
     render: function() {
-        document.getElementById('disp-name').innerText = state.name + " (" + state.age + "y) - " + (state.job || "No Job");
-        document.getElementById('disp-money').innerText = "Bank: $" + state.money;
-        document.getElementById('disp-health').innerText = "Health: " + state.health + "%";
-        document.getElementById('disp-happy').innerText = "Happy: " + state.happiness + "% | Crimes: " + state.crimes;
+        document.getElementById('header-money').innerText = "$" + state.money.toLocaleString();
+        document.getElementById('val-health').innerText = state.health + "%";
+        document.getElementById('val-happy').innerText = state.happiness + "%";
+        document.getElementById('val-smarts').innerText = state.smarts + "%";
+        document.getElementById('val-looks').innerText = state.looks + "%";
+        
+        document.getElementById('bar-health').style.width = state.health + "%";
+        document.getElementById('bar-happy').style.width = state.happiness + "%";
+        document.getElementById('bar-smarts').style.width = state.smarts + "%";
+        document.getElementById('bar-looks').style.width = state.looks + "%";
     },
-    addLog: function(age, text) {
+    addLog: function(text) {
         const logBox = document.getElementById('game-log');
         const entry = document.createElement('div');
         entry.className = "log-entry";
-        entry.innerHTML = "<span class='age-badge'>" + age + "y</span> " + text;
-        logBox.prepend(entry);
+        entry.innerHTML = `<span class='badge'>${state.age}y</span> ${text}`;
+        logBox.appendChild(entry);
+    },
+    scrollToBottom: function() {
+        const logBox = document.getElementById('game-log');
+        logBox.scrollTop = logBox.scrollHeight;
     }
 };
 
-game.init();
+ui.render();
