@@ -119,7 +119,7 @@ const game = {
             },
             {
                 chance: 0.05,
-                condition: true,
+                condition: state.age >= 10,
                 effect: () => {
                     let loss = Math.floor(Math.random() * 5000) + 1000;
                     state.money -= loss;
@@ -129,7 +129,7 @@ const game = {
             },
             {
                 chance: 0.03,
-                condition: true,
+                condition: state.age >= 18,
                 effect: () => {
                     state.money -= 2000;
                     return "⚖️ Paid unexpected legal fees -$2000";
@@ -342,7 +342,7 @@ const game = {
             },
             {
                 chance: 0.025,
-                condition: true,
+                condition: state.age >= 16,
                 effect: () => {
                     state.smarts -= 5;
                     state.happiness -= 10;
@@ -361,7 +361,7 @@ const game = {
             },
             {
                 chance: 0.015,
-                condition: true,
+                condition: state.age >= 12,
                 effect: () => {
                     state.happiness -= 10;
                     return "📱 Spent too much time on social media... -10 Happiness";
@@ -370,7 +370,7 @@ const game = {
             },
             {
                 chance: 0.02,
-                condition: true,
+                condition: state.age >= 16 && state.salary > 0,
                 effect: () => {
                     state.money += 500;
                     return "💼 Got a bonus at work! +$500";
