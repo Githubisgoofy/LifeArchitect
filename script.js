@@ -22,6 +22,26 @@ const state = {
     processingEvents: false
 };
 
+// --- SAVE SYSTEM ---
+const save = {
+    save: function() {
+        localStorage.setItem('lifeArchitectSave', JSON.stringify(state));
+    },
+    load: function() {
+        const saved = localStorage.getItem('lifeArchitectSave');
+        if (saved) {
+            const loadedState = JSON.parse(saved);
+            Object.assign(state, loadedState);
+            return true;
+        }
+        return false;
+    },
+    clear: function() {
+        localStorage.removeItem('lifeArchitectSave');
+        location.reload();
+    }
+};
+
 // --- CORE ENGINE ---
 const game = {
     start: function() {
@@ -81,6 +101,7 @@ const game = {
         ui.updateAvatar();
         ui.render();
         ui.scrollToBottom();
+        save.save();
     },
 
     randomEvents: function() {
@@ -736,6 +757,23 @@ const ui = {
         event.target.classList.add('active');
     },
     
+    loadGame: function() {
+        if (!save.load()) {
+            alert("No save file found!");
+            return;
+        }
+        document.getElementById('char-creation').style.display = 'none';
+        document.getElementById('game-screen').classList.remove('hidden');
+        document.getElementById('header-name').innerText = state.name;
+        this.render();
+        this.updateAvatar();
+        this.scrollToBottom();
+    },
+    
+    newGame: function() {
+        save.clear();
+    },
+    
     startGame: function() {
         let name = document.getElementById('char-name').value.trim();
         if (!name || !this.selectedGender) {
@@ -770,6 +808,7 @@ const ui = {
         state.name = name;
         state.gender = this.selectedGender;
         game.start();
+        save.save();
     },
     
     render: function() {
