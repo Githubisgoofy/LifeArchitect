@@ -389,14 +389,14 @@ const game = {
             }
         }
         
-        // Limit to 0-2 random events per age (not counting milestones)
-        if (triggeredEvents.length > 2) {
-            // Shuffle and take top 2
+        // Limit to 0-1 random events per age (not counting milestones)
+        if (triggeredEvents.length > 1) {
+            // Shuffle and take top 1
             for (let i = triggeredEvents.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [triggeredEvents[i], triggeredEvents[j]] = [triggeredEvents[j], triggeredEvents[i]];
             }
-            triggeredEvents = triggeredEvents.slice(0, 2);
+            triggeredEvents = triggeredEvents.slice(0, 1);
         }
         
         // Add triggered events to queue
