@@ -256,11 +256,15 @@ const game = {
     handleDeath: function() {
         state.alive = false;
         let cause = "natural causes";
-        if (state.age < 30) cause = "a tragic accident";
-        else if (state.health < -50) cause = "illness";
-        else cause = "old age";
+        if (state.age < 20) cause = "a tragic accident";
+        else if (state.age < 35 && state.health <= 0) cause = "illness or accident";
+        else if (state.health <= -50) cause = "severe illness";
+        else if (state.age >= 100) cause = "extreme old age";
+        else if (state.age >= 80) cause = "old age";
+        else cause = "natural causes";
         
-        ui.showPopup("💀 Game Over", `You died at age ${state.age} from ${cause}.\n\nFinal Net Worth: $${state.money}\nKids: ${state.kids}\nFame: ${state.fame}`, 
+        const netWorth = Math.max(0, state.money);
+        ui.showPopup("💀 Game Over", `You died at age ${state.age} from ${cause}.\n\nFinal Net Worth: $${netWorth.toLocaleString()}\nKids: ${state.kids}\nFame: ${state.fame}`, 
             [{ text: "Play Again", action: () => { location.reload(); } }]);
     },
 
@@ -612,13 +616,21 @@ const ui = {
     },
     
     render: function() {
+        // Clamp all stats to valid ranges (0-100)
+        state.health = Math.max(0, Math.min(100, state.health));
+        state.happiness = Math.max(0, Math.min(100, state.happiness));
+        state.smarts = Math.max(0, Math.min(100, state.smarts));
+        state.looks = Math.max(0, Math.min(100, state.looks));
+        state.money = Math.max(0, state.money); // Money can't go negative
+        state.fame = Math.max(0, state.fame); // Fame can't go negative
+        
         document.getElementById('header-age').innerText = "Age: " + state.age;
         document.getElementById('header-money').innerText = "$" + state.money.toLocaleString();
         
-        document.getElementById('bar-health').style.width = Math.max(0, state.health) + "%";
-        document.getElementById('bar-happy').style.width = Math.max(0, state.happiness) + "%";
-        document.getElementById('bar-smarts').style.width = Math.min(100, state.smarts) + "%";
-        document.getElementById('bar-looks').style.width = Math.min(100, state.looks) + "%";
+        document.getElementById('bar-health').style.width = state.health + "%";
+        document.getElementById('bar-happy').style.width = state.happiness + "%";
+        document.getElementById('bar-smarts').style.width = state.smarts + "%";
+        document.getElementById('bar-looks').style.width = state.looks + "%";
     },
 
     updateAvatar: function() {
@@ -637,8 +649,8 @@ const ui = {
         entry.innerHTML = `<b>${state.age}y:</b> ${text}`;
         logBox.appendChild(entry);
         
-        // Limit log entries to 30 to keep it snappy
-        const entries = logBox.querySelectorAll('.log-entry');
+        // Limit log entries to 30 - FIXED LOGIC
+        let entries = logBox.querySelectorAll('.log-entry');
         while (entries.length > 30) {
             entries[0].remove();
             entries = logBox.querySelectorAll('.log-entry');
