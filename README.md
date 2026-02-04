@@ -24,7 +24,7 @@ A BitLife-inspired life simulation game built with vanilla HTML, CSS, and JavaSc
 
 ## Try it Online
 
-[Play LifeArchitect](https://github.com/YOUR-USERNAME/LifeArchitect)
+[Play LifeArchitect](https://github.com/Githubisgoofy/LifeArchitect)
 
 ## License
 
