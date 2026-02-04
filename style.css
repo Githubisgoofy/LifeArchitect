@@ -17,18 +17,18 @@
 body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: #121212; display: flex; justify-content: center; height: 100vh; color: white; overflow: hidden; }
 
 /* APP CONTAINER */
-.app-container { width: 100%; max-width: 420px; background: #1e1e1e; height: 100%; display: flex; flex-direction: column; box-shadow: 0 0 30px rgba(0,0,0,0.8); position: relative; }
+.app-container { width: 100%; max-width: 420px; background: #1e1e1e; height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 30px rgba(0,0,0,0.8); position: relative; overflow: hidden; }
 
 /* TOP BAR */
-.top-bar { padding: 15px; background: #252525; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+.top-bar { padding: 15px; background: #252525; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; flex-shrink: 0; }
 .top-info { display: flex; flex-direction: column; }
 #header-name { font-weight: bold; font-size: 18px; }
 .highlight { color: #aaa; font-size: 14px; }
 .money-display { color: #85bb65; font-weight: bold; font-size: 18px; font-family: monospace; }
 
 /* AVATAR AREA */
-.character-area { display: flex; padding: 20px; align-items: center; gap: 15px; background: #2a2a2a; border-bottom: 1px solid #333; }
-.avatar-circle { width: 80px; height: 80px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 3px solid #444; shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.character-area { display: flex; padding: 20px; align-items: center; gap: 15px; background: #2a2a2a; border-bottom: 1px solid #333; flex-shrink: 0; }
+.avatar-circle { width: 80px; height: 80px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 3px solid #444; shadow: 0 4px 10px rgba(0,0,0,0.3); flex-shrink: 0; }
 .status-bars { flex-grow: 1; display: flex; flex-direction: column; gap: 6px; }
 .bar-row { display: flex; align-items: center; gap: 8px; }
 .icon { font-size: 14px; width: 20px; text-align: center; }
@@ -37,14 +37,14 @@ body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; backg
 .red { background: #ff4757; } .orange { background: #ffa502; } .blue { background: #1e90ff; } .purple { background: #a55eea; }
 
 /* LOG */
-.game-log { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding: 15px; background: #1e1e1e; max-height: 100%; }
+.game-log { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 15px; background: #1e1e1e; min-height: 0; }
 .log-entry { margin-bottom: 10px; padding: 10px; background: #252525; border-radius: 8px; font-size: 14px; line-height: 1.4; border-left: 4px solid #555; animation: slideIn 0.3s; }
 .log-entry.bad { border-left-color: #ff4757; }
 .log-entry.good { border-left-color: #2ed573; }
 @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* CONTROLS */
-.controls-area { padding: 10px; background: #252525; border-top: 1px solid #333; }
+.controls-area { padding: 10px; background: #252525; border-top: 1px solid #333; flex-shrink: 0; }
 .grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
 .grid-menu button { background: #333; border: none; border-radius: 8px; padding: 12px; color: white; cursor: pointer; transition: 0.1s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .grid-menu button:active { background: #444; transform: scale(0.96); }
