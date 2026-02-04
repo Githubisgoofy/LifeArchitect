@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LifeArchitect v0.1</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="header">LifeArchitect v0.1</div>
+        
+        <div class="stats-bar">
+            <div id="disp-name">Name: Unknown</div>
+            <div id="disp-money">Bank: $0</div>
+            <div id="disp-health">Health: 100%</div>
+            <div id="disp-happy">Happy: 100%</div>
+        </div>
+
+        <div class="log" id="game-log"></div>
+
+        <div class="controls">
+            <button class="btn-action" onclick="actions.askMoney()">Ask Parents for Money</button>
+            <button class="btn-action" onclick="actions.workout()">Go to Gym</button>
+            <button class="btn-age" onclick="game.ageUp()">+ Age Up</button>
+        </div>
+    </div>
+</body>
+</html>
