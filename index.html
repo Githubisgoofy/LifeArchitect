@@ -10,22 +10,37 @@
         <div class="header">LifeArchitect v0.1</div>
         
         <div class="stats-bar">
-            <div id="disp-name">Name: Unknown</div>
-            <div id="disp-money">Bank: $0</div>
-            <div id="disp-health">Health: 100%</div>
-            <div id="disp-happy">Happy: 100%</div>
+            <div id="header-money">$0</div>
+            <div class="stat-row">
+                <span>Health: <span id="val-health">100%</span></span>
+                <div class="bar" id="bar-health" style="width: 100%; background: #4CAF50;"></div>
+            </div>
+            <div class="stat-row">
+                <span>Happy: <span id="val-happy">100%</span></span>
+                <div class="bar" id="bar-happy" style="width: 100%; background: #FF69B4;"></div>
+            </div>
+            <div class="stat-row">
+                <span>Smarts: <span id="val-smarts">50%</span></span>
+                <div class="bar" id="bar-smarts" style="width: 50%; background: #2196F3;"></div>
+            </div>
+            <div class="stat-row">
+                <span>Looks: <span id="val-looks">50%</span></span>
+                <div class="bar" id="bar-looks" style="width: 50%; background: #FF9800;"></div>
+            </div>
         </div>
 
         <div class="log" id="game-log"></div>
 
         <div class="controls">
-            <button class="btn-action" onclick="actions.askMoney()">Ask Parents for Money</button>
-            <button class="btn-action" onclick="actions.workout()">Go to Gym</button>
-            <button class="btn-action" onclick="actions.getJob()">Get a Job</button>
-            <button class="btn-action" onclick="actions.work()">Work</button>
-            <button class="btn-danger" onclick="actions.playCasino()">Play Casino ($50)</button>
-            <button class="btn-danger" onclick="actions.commitCrime()">Commit Crime</button>
-            <button class="btn-age" onclick="game.ageUp()">+ Age Up</button>
+            <button class="btn-action" onclick="game.ageUp()">+ Age Up</button>
+            <button class="btn-action" onclick="actions.school()">University</button>
+            <button class="btn-action" onclick="actions.job()">Get Job</button>
+            <button class="btn-action" onclick="actions.love()">Dating App</button>
+            <button class="btn-action" onclick="actions.casino()">Casino</button>
+            <button class="btn-danger" onclick="actions.crime()">Crime</button>
+            <button class="btn-action" onclick="actions.doctor()">Doctor</button>
+            <button class="btn-action" onclick="actions.assets()">Assets</button>
+            <button class="btn-action" onclick="actions.profile()">Profile</button>
         </div>
     </div>
 </body>
