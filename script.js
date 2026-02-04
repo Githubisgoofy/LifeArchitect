@@ -86,15 +86,16 @@ const game = {
     randomEvents: function() {
         state.eventQueue = [];
         
-        if (state.age === 6) state.eventQueue.push({text: "🎒 Started Elementary School.", type: "good"});
-        if (state.age === 18) state.eventQueue.push({text: "🎓 Graduated High School.", type: "good"});
+        // Check for milestones first
+        let hasMilestone = false;
+        if (state.age === 6) { state.eventQueue.push({text: "🎒 Started Elementary School.", type: "good"}); hasMilestone = true; }
+        if (state.age === 18) { state.eventQueue.push({text: "🎓 Graduated High School.", type: "good"}); hasMilestone = true; }
+        if (state.age === 21) { state.eventQueue.push({text: "🎉 You're officially an adult! Time to party!", type: "good"}); hasMilestone = true; }
+        if (state.age === 30) { state.eventQueue.push({text: "📊 Halfway through your 30s! Reflect on your journey.", type: "neutral"}); hasMilestone = true; }
+        if (state.age === 50) { state.eventQueue.push({text: "🎂 You hit the big 5-0! Still got it!", type: "good"}); hasMilestone = true; }
         
-        // Milestone birthdays
-        if (state.age === 21) state.eventQueue.push({text: "🎉 You're officially an adult! Time to party!", type: "good"});
-        if (state.age === 30) state.eventQueue.push({text: "📊 Halfway through your 30s! Reflect on your journey.", type: "neutral"});
-        if (state.age === 50) state.eventQueue.push({text: "🎂 You hit the big 5-0! Still got it!", type: "good"});
-        
-        // Create array of possible events with probabilities
+        // Only roll random events if there's NO milestone this age
+        if (!hasMilestone) {
         const possibleEvents = [
             {
                 chance: 0.04,
@@ -401,8 +402,9 @@ const game = {
         
         // Add triggered events to queue
         state.eventQueue.push(...triggeredEvents);
+        } // End of "if no milestone" block
         
-        // Process queue (log events immediately, but max 2 per age)
+        // Process queue (log events immediately, only 1 thing per age)
         for (let event of state.eventQueue) {
             this.log(event.text, event.type);
         }
