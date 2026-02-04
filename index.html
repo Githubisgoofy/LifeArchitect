@@ -1,47 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>LifeArchitect v0.1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Life Architect</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div class="phone-container">
-        <div class="header">LifeArchitect v0.1</div>
+    <div class="app-container">
         
-        <div class="stats-bar">
-            <div id="header-money">$0</div>
-            <div class="stat-row">
-                <span>Health: <span id="val-health">100%</span></span>
-                <div class="bar" id="bar-health" style="width: 100%; background: #4CAF50;"></div>
+        <div class="top-bar">
+            <div class="top-info">
+                <span id="header-name">Alex</span>
+                <span id="header-age" class="highlight">Age: 0</span>
             </div>
-            <div class="stat-row">
-                <span>Happy: <span id="val-happy">100%</span></span>
-                <div class="bar" id="bar-happy" style="width: 100%; background: #FF69B4;"></div>
-            </div>
-            <div class="stat-row">
-                <span>Smarts: <span id="val-smarts">50%</span></span>
-                <div class="bar" id="bar-smarts" style="width: 50%; background: #2196F3;"></div>
-            </div>
-            <div class="stat-row">
-                <span>Looks: <span id="val-looks">50%</span></span>
-                <div class="bar" id="bar-looks" style="width: 50%; background: #FF9800;"></div>
+            <div class="money-display" id="header-money">$0</div>
+        </div>
+
+        <div class="character-area">
+            <div class="avatar-circle" id="avatar-display">👶</div>
+            <div class="status-bars">
+                <div class="bar-row"><span class="icon">❤️</span> <div class="track"><div id="bar-health" class="fill red"></div></div></div>
+                <div class="bar-row"><span class="icon">😄</span> <div class="track"><div id="bar-happy" class="fill orange"></div></div></div>
+                <div class="bar-row"><span class="icon">🧠</span> <div class="track"><div id="bar-smarts" class="fill blue"></div></div></div>
+                <div class="bar-row"><span class="icon">😎</span> <div class="track"><div id="bar-looks" class="fill purple"></div></div></div>
             </div>
         </div>
 
-        <div class="log" id="game-log"></div>
-
-        <div class="controls">
-            <button class="btn-action" onclick="game.ageUp()">+ Age Up</button>
-            <button class="btn-action" onclick="actions.school()">University</button>
-            <button class="btn-action" onclick="actions.job()">Get Job</button>
-            <button class="btn-action" onclick="actions.love()">Dating App</button>
-            <button class="btn-action" onclick="actions.casino()">Casino</button>
-            <button class="btn-danger" onclick="actions.crime()">Crime</button>
-            <button class="btn-action" onclick="actions.doctor()">Doctor</button>
-            <button class="btn-action" onclick="actions.assets()">Assets</button>
-            <button class="btn-action" onclick="actions.profile()">Profile</button>
+        <div id="game-log" class="game-log">
+            <div class="log-entry">Welcome to Life Architect. Your story begins.</div>
         </div>
+
+        <div class="controls-area">
+            <div class="grid-menu">
+                <button onclick="actions.school()">
+                    <div class="btn-icon">📚</div>
+                    <span>School</span>
+                </button>
+                <button onclick="actions.job()">
+                    <div class="btn-icon">💼</div>
+                    <span>Jobs</span>
+                </button>
+                <button onclick="actions.love()">
+                    <div class="btn-icon">💘</div>
+                    <span>Love</span>
+                </button>
+                <button onclick="actions.assets()">
+                    <div class="btn-icon">🏠</div>
+                    <span>Shop</span>
+                </button>
+                <button onclick="actions.activities()">
+                    <div class="btn-icon">🏄</div>
+                    <span>Activities</span>
+                </button>
+                <button onclick="actions.crime()">
+                    <div class="btn-icon">😈</div>
+                    <span>Crime</span>
+                </button>
+            </div>
+            
+            <button id="btn-age" class="btn-age" onclick="game.ageUp()">+ AGE UP</button>
+        </div>
+
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <div class="modal-box">
+                <h2 id="modal-title">Title</h2>
+                <p id="modal-text">Description text goes here.</p>
+                <div id="modal-buttons" class="modal-buttons">
+                    </div>
+            </div>
+        </div>
+
     </div>
 </body>
 </html>
