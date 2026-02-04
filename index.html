@@ -10,6 +10,22 @@
 <body>
     <div class="app-container">
         
+        <div id="char-creation" class="char-creation-screen">
+            <div class="char-creation-box">
+                <h1>👶 Create Your Character</h1>
+                <input type="text" id="char-name" placeholder="Enter your name" maxlength="20">
+                
+                <div class="gender-select">
+                    <button class="gender-btn male-btn" onclick="ui.selectGender('Male')">👨 Male</button>
+                    <button class="gender-btn female-btn" onclick="ui.selectGender('Female')">👩 Female</button>
+                </div>
+                
+                <button class="btn-start" onclick="ui.startGame()">START LIFE</button>
+            </div>
+        </div>
+
+        <div id="game-screen" class="game-screen hidden">
+        
         <div class="top-bar">
             <div class="top-info">
                 <span id="header-name">Alex</span>
@@ -70,6 +86,8 @@
                 <div id="modal-buttons" class="modal-buttons">
                     </div>
             </div>
+        </div>
+
         </div>
 
     </div>
