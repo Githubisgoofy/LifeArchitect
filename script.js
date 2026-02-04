@@ -646,6 +646,29 @@ const ui = {
             alert("Please enter a name and select a gender!");
             return;
         }
+        
+        // Filter inappropriate content
+        const badWords = ["ass", "shit", "fuck", "bitch", "damn", "hell", "cunt", "dick", "pussy", "whore", "slut", "nigga", "nigger", "faggot", "retard"];
+        const nameLower = name.toLowerCase();
+        for (let word of badWords) {
+            if (nameLower.includes(word)) {
+                alert("⚠️ Name contains inappropriate content. Please choose another.");
+                return;
+            }
+        }
+        
+        // Max length check
+        if (name.length > 20) {
+            alert("Name too long! Max 20 characters.");
+            return;
+        }
+        
+        // Only letters, numbers, and spaces allowed
+        if (!/^[a-zA-Z0-9\s\-']+$/.test(name)) {
+            alert("⚠️ Name can only contain letters, numbers, spaces, hyphens, and apostrophes.");
+            return;
+        }
+        
         state.name = name;
         state.gender = this.selectedGender;
         game.start();
