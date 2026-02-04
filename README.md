@@ -1,4 +1,4 @@
-# LifeArchitect v2.0
+# LifeArchitect v3.0
 
 A BitLife-inspired life simulation game built with vanilla HTML, CSS, and JavaScript.
 
