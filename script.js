@@ -82,239 +82,174 @@ const game = {
     },
 
     randomEvents: function() {
-        const r = Math.random();
-        const events = [];
-        
         if (state.age === 6) this.log("🎒 Started Elementary School.", "good");
         if (state.age === 18) this.log("🎓 Graduated High School.", "good");
         
         // Milestone birthdays
-        if (state.age === 21) events.push(() => this.log("🎉 You're officially an adult! Time to party!", "good"));
-        if (state.age === 30) events.push(() => this.log("📊 Halfway through your 30s! Reflect on your journey.", "neutral"));
-        if (state.age === 50) events.push(() => this.log("🎂 You hit the big 5-0! Still got it!", "good"));
+        if (state.age === 21) this.log("🎉 You're officially an adult! Time to party!", "good");
+        if (state.age === 30) this.log("📊 Halfway through your 30s! Reflect on your journey.", "neutral");
+        if (state.age === 50) this.log("🎂 You hit the big 5-0! Still got it!", "good");
         
-        // Financial events
-        events.push(() => {
-            if (r < 0.04 && state.age > 30) {
-                let inheritance = Math.floor(Math.random() * 50000) + 10000;
-                state.money += inheritance;
-                this.log(`💰 A relative left you $${inheritance} in their will!`, "good");
-            }
-        });
+        // Financial events - EACH HAS ITS OWN RANDOM CHECK NOW
+        if (Math.random() < 0.04 && state.age > 30) {
+            let inheritance = Math.floor(Math.random() * 50000) + 10000;
+            state.money += inheritance;
+            this.log(`💰 A relative left you $${inheritance} in their will!`, "good");
+        }
         
-        events.push(() => {
-            if (r < 0.03) {
-                let lottery = Math.floor(Math.random() * 100000) + 50000;
-                state.money += lottery;
-                this.log(`🎰 Won lottery! +$${lottery}!`, "good");
-            }
-        });
+        if (Math.random() < 0.03) {
+            let lottery = Math.floor(Math.random() * 100000) + 50000;
+            state.money += lottery;
+            this.log(`🎰 Won lottery! +$${lottery}!`, "good");
+        }
         
-        events.push(() => {
-            if (r < 0.05) {
-                let loss = Math.floor(Math.random() * 5000) + 1000;
-                state.money -= loss;
-                this.log(`💸 Got pickpocketed! Lost $${loss}`, "bad");
-            }
-        });
+        if (Math.random() < 0.05) {
+            let loss = Math.floor(Math.random() * 5000) + 1000;
+            state.money -= loss;
+            this.log(`💸 Got pickpocketed! Lost $${loss}`, "bad");
+        }
         
-        events.push(() => {
-            if (r < 0.03) {
-                state.money -= 2000;
-                this.log("⚖️ Paid unexpected legal fees -$2000", "bad");
-            }
-        });
+        if (Math.random() < 0.03) {
+            state.money -= 2000;
+            this.log("⚖️ Paid unexpected legal fees -$2000", "bad");
+        }
         
         // Health events
-        events.push(() => {
-            if (r < 0.07) {
-                state.health -= 15;
-                this.log("🚗 Car accident! -15 Health", "bad");
-            }
-        });
+        if (Math.random() < 0.07) {
+            state.health -= 15;
+            this.log("🚗 Car accident! -15 Health", "bad");
+        }
         
-        events.push(() => {
-            if (r < 0.05) {
-                state.health -= 10;
-                this.log("🤒 Got the flu! -10 Health", "bad");
-            }
-        });
+        if (Math.random() < 0.05) {
+            state.health -= 10;
+            this.log("🤒 Got the flu! -10 Health", "bad");
+        }
         
-        events.push(() => {
-            if (r < 0.04) {
-                state.health += 20;
-                this.log("💪 Started an exercise routine! +20 Health", "good");
-            }
-        });
+        if (Math.random() < 0.04) {
+            state.health += 20;
+            this.log("💪 Started an exercise routine! +20 Health", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.03) {
-                state.health -= 20;
-                state.money -= 5000;
-                this.log("🏥 Emergency hospital visit! -20 Health, -$5000", "bad");
-            }
-        });
+        if (Math.random() < 0.03) {
+            state.health -= 20;
+            state.money -= 5000;
+            this.log("🏥 Emergency hospital visit! -20 Health, -$5000", "bad");
+        }
         
-        events.push(() => {
-            if (r < 0.02) {
-                state.health += 10;
-                this.log("😊 Feeling great today! +10 Health", "good");
-            }
-        });
+        if (Math.random() < 0.02) {
+            state.health += 10;
+            this.log("😊 Feeling great today! +10 Health", "good");
+        }
         
         // Happiness events
-        events.push(() => {
-            if (r < 0.06) {
-                state.happiness += 15;
-                this.log("🎊 Great day at work! +15 Happiness", "good");
-            }
-        });
+        if (Math.random() < 0.06) {
+            state.happiness += 15;
+            this.log("🎊 Great day at work! +15 Happiness", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.05) {
-                state.happiness -= 15;
-                this.log("😞 Had a terrible day... -15 Happiness", "bad");
-            }
-        });
+        if (Math.random() < 0.05) {
+            state.happiness -= 15;
+            this.log("😞 Had a terrible day... -15 Happiness", "bad");
+        }
         
-        events.push(() => {
-            if (r < 0.04) {
-                state.happiness += 10;
-                this.log("🎬 Watched a great movie! +10 Happiness", "good");
-            }
-        });
+        if (Math.random() < 0.04) {
+            state.happiness += 10;
+            this.log("🎬 Watched a great movie! +10 Happiness", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.03) {
-                state.happiness -= 20;
-                this.log("💔 Relationship drama... -20 Happiness", "bad");
-            }
-        });
+        if (Math.random() < 0.03) {
+            state.happiness -= 20;
+            this.log("💔 Relationship drama... -20 Happiness", "bad");
+        }
         
         // Fame events
-        events.push(() => {
-            if (r < 0.04) {
-                state.fame += 5;
-                this.log("📸 Went viral on social media! +5 Fame", "good");
-            }
-        });
+        if (Math.random() < 0.04) {
+            state.fame += 5;
+            this.log("📸 Went viral on social media! +5 Fame", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.03) {
-                state.fame += 10;
-                state.happiness += 20;
-                this.log("🌟 Became famous! +10 Fame, +20 Happiness", "good");
-            }
-        });
+        if (Math.random() < 0.03) {
+            state.fame += 10;
+            state.happiness += 20;
+            this.log("🌟 Became famous! +10 Fame, +20 Happiness", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.02) {
-                state.fame -= 5;
-                this.log("😬 Embarrassing incident... -5 Fame", "bad");
-            }
-        });
+        if (Math.random() < 0.02) {
+            state.fame -= 5;
+            this.log("😬 Embarrassing incident... -5 Fame", "bad");
+        }
         
         // Stat events
-        events.push(() => {
-            if (r < 0.03) {
-                state.smarts += 5;
-                this.log("📚 Learned something new today! +5 Smarts", "good");
-            }
-        });
+        if (Math.random() < 0.03) {
+            state.smarts += 5;
+            this.log("📚 Learned something new today! +5 Smarts", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.03) {
-                state.looks += 3;
-                this.log("💇 Got a makeover! +3 Looks", "good");
-            }
-        });
+        if (Math.random() < 0.03) {
+            state.looks += 3;
+            this.log("💇 Got a makeover! +3 Looks", "good");
+        }
         
         // Family events
-        events.push(() => {
-            if (state.partner && state.age > 25 && r < 0.08 && state.kids < 3) {
-                state.kids++;
-                state.happiness += 30;
-                state.money -= 5000;
-                this.log(`👶 You had a baby! +30 Happiness, -$5000`, "good");
-            }
-        });
+        if (state.partner && state.age > 25 && Math.random() < 0.08 && state.kids < 3) {
+            state.kids++;
+            state.happiness += 30;
+            state.money -= 5000;
+            this.log(`👶 You had a baby! +30 Happiness, -$5000`, "good");
+        }
         
-        events.push(() => {
-            if (state.partner && r < 0.02) {
-                state.happiness += 20;
-                this.log("💕 Romantic anniversary with " + state.partner + "! +20 Happiness", "good");
-            }
-        });
+        if (state.partner && Math.random() < 0.02) {
+            state.happiness += 20;
+            this.log("💕 Romantic anniversary with " + state.partner + "! +20 Happiness", "good");
+        }
         
-        events.push(() => {
-            if (state.partner && r < 0.02) {
-                state.partner = null;
-                state.happiness -= 30;
-                this.log("💔 Relationship ended! -30 Happiness", "bad");
-            }
-        });
+        if (state.partner && Math.random() < 0.02) {
+            state.partner = null;
+            state.happiness -= 30;
+            this.log("💔 Relationship ended! -30 Happiness", "bad");
+        }
         
         // Surprise events
-        events.push(() => {
-            if (r < 0.02) {
-                state.money += 1000;
-                this.log("🎁 Found $1000 on the street!", "good");
-            }
-        });
+        if (Math.random() < 0.02) {
+            state.money += 1000;
+            this.log("🎁 Found $1000 on the street!", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.02) {
-                state.happiness += 25;
-                this.log("🎉 Got invited to an amazing party! +25 Happiness", "good");
-            }
-        });
+        if (Math.random() < 0.02) {
+            state.happiness += 25;
+            this.log("🎉 Got invited to an amazing party! +25 Happiness", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.01) {
-                state.money += Math.floor(Math.random() * 20000) + 10000;
-                this.log("🏆 Won a competition! +$" + (Math.floor(Math.random() * 20000) + 10000), "good");
-            }
-        });
+        if (Math.random() < 0.01) {
+            let winnings = Math.floor(Math.random() * 20000) + 10000;
+            state.money += winnings;
+            this.log("🏆 Won a competition! +$" + winnings, "good");
+        }
         
-        events.push(() => {
-            if (r < 0.02) {
-                this.log("🐱 A stray cat followed you home today!", "neutral");
-                state.happiness += 5;
-            }
-        });
+        if (Math.random() < 0.02) {
+            this.log("🐱 A stray cat followed you home today!", "neutral");
+            state.happiness += 5;
+        }
         
-        events.push(() => {
-            if (r < 0.015) {
-                state.money -= 500;
-                this.log("🐝 Got stung by a bee! -$500 for medical care", "bad");
-            }
-        });
+        if (Math.random() < 0.015) {
+            state.money -= 500;
+            this.log("🐝 Got stung by a bee! -$500 for medical care", "bad");
+        }
         
-        events.push(() => {
-            if (r < 0.025) {
-                state.smarts -= 5;
-                state.happiness -= 10;
-                this.log("😵 Got too drunk last night! -5 Smarts, -10 Happiness", "bad");
-            }
-        });
+        if (Math.random() < 0.025) {
+            state.smarts -= 5;
+            state.happiness -= 10;
+            this.log("😵 Got too drunk last night! -5 Smarts, -10 Happiness", "bad");
+        }
         
-        events.push(() => {
-            if (r < 0.02) {
-                state.health += 15;
-                this.log("🧘 Meditation and yoga session! +15 Health", "good");
-            }
-        });
+        if (Math.random() < 0.02) {
+            state.health += 15;
+            this.log("🧘 Meditation and yoga session! +15 Health", "good");
+        }
         
-        events.push(() => {
-            if (r < 0.015) {
-                state.money += 5000;
-                this.log("💼 Got a work bonus! +$5000", "good");
-            }
-        });
-        
-        // Run random subset of events to keep things unpredictable
-        for (let event of events) {
-            event();
+        if (Math.random() < 0.015) {
+            state.money += 5000;
+            this.log("💼 Got a work bonus! +$5000", "good");
         }
     },
 
@@ -647,16 +582,6 @@ const ui = {
             return;
         }
         
-        // Filter inappropriate content
-        const badWords = ["ass", "shit", "fuck", "bitch", "damn", "hell", "cunt", "dick", "pussy", "whore", "slut", "nigga", "nigger", "faggot", "retard"];
-        const nameLower = name.toLowerCase();
-        for (let word of badWords) {
-            if (nameLower.includes(word)) {
-                alert("⚠️ Name contains inappropriate content. Please choose another.");
-                return;
-            }
-        }
-        
         // Max length check
         if (name.length > 20) {
             alert("Name too long! Max 20 characters.");
@@ -667,6 +592,18 @@ const ui = {
         if (!/^[a-zA-Z0-9\s\-']+$/.test(name)) {
             alert("⚠️ Name can only contain letters, numbers, spaces, hyphens, and apostrophes.");
             return;
+        }
+        
+        // Filter inappropriate content - STRICT CHECK
+        const badWords = ["ass", "shit", "fuck", "bitch", "damn", "hell", "cunt", "dick", "pussy", "whore", "slut", "nigga", "nigger", "faggot", "retard", "piss", "cock", "twat", "bastard", "asshole", "dumbass"];
+        const nameLower = name.toLowerCase();
+        
+        for (let word of badWords) {
+            if (nameLower.includes(word)) {
+                alert("⚠️ Name contains inappropriate content. Please choose another.");
+                document.getElementById('char-name').value = "";
+                return;
+            }
         }
         
         state.name = name;
