@@ -29,8 +29,8 @@
                 <input type="text" id="char-name" placeholder="Enter your name" maxlength="20">
                 
                 <div class="gender-select">
-                    <button class="gender-btn male-btn" onclick="ui.selectGender('Male')">👨 Male</button>
-                    <button class="gender-btn female-btn" onclick="ui.selectGender('Female')">👩 Female</button>
+                    <button class="gender-btn male-btn" onclick="ui.selectGender('Male', this)">👨 Male</button>
+                    <button class="gender-btn female-btn" onclick="ui.selectGender('Female', this)">👩 Female</button>
                 </div>
                 
                 <button class="btn-start" onclick="ui.startGame()">START LIFE</button>
@@ -55,6 +55,33 @@
                 <div class="bar-row"><span class="icon">😄</span> <div class="track"><div id="bar-happy" class="fill orange"></div></div></div>
                 <div class="bar-row"><span class="icon">🧠</span> <div class="track"><div id="bar-smarts" class="fill blue"></div></div></div>
                 <div class="bar-row"><span class="icon">😎</span> <div class="track"><div id="bar-looks" class="fill purple"></div></div></div>
+            </div>
+        </div>
+
+        <div class="life-snapshot">
+            <div class="snapshot-item">
+                <span class="snapshot-label">Career</span>
+                <span id="snapshot-job" class="snapshot-value">Unemployed</span>
+            </div>
+            <div class="snapshot-item">
+                <span class="snapshot-label">Relationship</span>
+                <span id="snapshot-partner" class="snapshot-value">Single</span>
+            </div>
+            <div class="snapshot-item compact">
+                <span class="snapshot-label">Kids</span>
+                <span id="snapshot-kids" class="snapshot-value">0</span>
+            </div>
+            <div class="snapshot-item compact">
+                <span class="snapshot-label">Fame</span>
+                <span id="snapshot-fame" class="snapshot-value">0</span>
+            </div>
+            <div class="snapshot-item">
+                <span class="snapshot-label">Annual Income</span>
+                <span id="snapshot-salary" class="snapshot-value">$0</span>
+            </div>
+            <div class="snapshot-item">
+                <span class="snapshot-label">Education</span>
+                <span id="snapshot-major" class="snapshot-value">Undeclared</span>
             </div>
         </div>
 
