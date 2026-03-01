@@ -233,6 +233,47 @@ body {
 .blue { background: #1e90ff; } 
 .purple { background: #a55eea; }
 
+
+.life-snapshot {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 12px;
+    background: #242424;
+    border-bottom: 1px solid #333;
+}
+
+.snapshot-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: #2f2f2f;
+    border: 1px solid #3f3f3f;
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 56px;
+}
+
+.snapshot-item.compact {
+    min-height: 48px;
+}
+
+.snapshot-label {
+    font-size: 11px;
+    color: #9f9f9f;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.snapshot-value {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* LOG - CRITICAL FIX */
 .game-log { 
     flex: 1; 

@@ -32,9 +32,11 @@ A BitLife-inspired life simulation game built with vanilla HTML, CSS, and JavaSc
 - Crime system (rob, pickpocket, etc)
 - Party, gym, and activity system
 - Sound effects on every action
-- Random life events that impact your stats
+- Weighted random life events with cleaner balancing
 - Better death system with cause of death
 - Dark mode UI with smooth animations
+- Live life snapshot panel (career, relationship, kids, fame, salary, education)
+- Autosave after every state update
 
 ## How to Play
 
