@@ -1,110 +1,843 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Life Architect v3.0</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
-    <style>
-        html, body { 
-            width: 100vw; 
-            height: 100vh; 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            -webkit-user-select: none;
-            user-select: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Life Architect v3.0</title>
+<style>
+*, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    margin: 0; padding: 0;
+}
+
+:root {
+    --bg: #111;
+    --surface: #1a1a1a;
+    --surface2: #222;
+    --border: #2a2a2a;
+    --accent: #667eea;
+    --green: #2ed573;
+    --red: #ff4757;
+    --orange: #ffa502;
+    --blue: #1e90ff;
+    --purple: #a55eea;
+    --text: #f0f0f0;
+    --muted: #888;
+}
+
+html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── SHELL ── */
+.shell {
+    width: 100vw;
+    height: 100vh;
+    max-width: 480px;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ── CHAR CREATION ── */
+.char-screen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    padding: 20px;
+}
+
+.char-box {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+}
+
+.char-box h1 {
+    font-size: clamp(20px, 5vw, 28px);
+    color: var(--text);
+    margin-bottom: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+#char-name {
+    width: 100%;
+    padding: 13px 16px;
+    font-size: 16px;
+    border: 2px solid rgba(102,126,234,0.4);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.4);
+    color: var(--text);
+    text-align: center;
+    outline: none;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+}
+#char-name:focus { border-color: var(--accent); }
+#char-name::placeholder { color: var(--muted); }
+
+.gender-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.gender-btn {
+    flex: 1;
+    padding: 14px 10px;
+    font-size: 15px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+.gender-btn:hover { border-color: var(--accent); background: rgba(102,126,234,0.15); }
+.gender-btn.active { border-color: var(--accent); background: var(--accent); }
+
+.btn-main {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+.btn-main:active { opacity: 0.85; transform: scale(0.98); }
+.btn-start  { background: linear-gradient(135deg, var(--green), #1ab558); }
+.btn-load   { background: linear-gradient(135deg, var(--accent), #5a6fd6); }
+.btn-danger { background: linear-gradient(135deg, var(--red), #cc3344); }
+
+/* ── TOP BAR ── */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.top-info { display: flex; flex-direction: column; line-height: 1.2; }
+#header-name { font-weight: 700; font-size: 16px; color: var(--text); }
+#header-age  { color: var(--muted); font-size: 12px; }
+.money-display { color: #4caf7d; font-weight: 700; font-size: 17px; font-family: monospace; }
+
+/* ── CHARACTER AREA ── */
+.char-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.avatar {
+    width: 62px; height: 62px;
+    background: var(--surface);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+}
+
+.bars { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.bar-icon { font-size: 12px; width: 16px; text-align: center; flex-shrink: 0; }
+
+.track {
+    flex: 1;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.fill.red    { background: linear-gradient(90deg, #ff4757, #ff6b7a); }
+.fill.orange { background: linear-gradient(90deg, #ffa502, #ffbe3d); }
+.fill.blue   { background: linear-gradient(90deg, #1e90ff, #5babff); }
+.fill.purple { background: linear-gradient(90deg, #a55eea, #c17af0); }
+
+/* ── LOG ── */
+.log {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 12px;
+    background: var(--bg);
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.log::-webkit-scrollbar { width: 3px; }
+.log::-webkit-scrollbar-track { background: transparent; }
+.log::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+.entry {
+    margin-bottom: 7px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border-radius: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+    border-left: 3px solid #444;
+    animation: slideIn 0.25s ease;
+    color: var(--text);
+}
+.entry.good { border-left-color: var(--green); }
+.entry.bad  { border-left-color: var(--red); }
+.entry.neutral { border-left-color: #555; }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── CONTROLS ── */
+.controls {
+    padding: 8px 10px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 7px;
+}
+
+.grid button {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 4px 7px;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: background 0.1s;
+    line-height: 1;
+}
+.grid button:active { background: #333; transform: scale(0.95); }
+.btn-icon { font-size: 20px; line-height: 1; }
+
+.btn-agp {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 9px;
+    font-size: 17px;
+    font-weight: 800;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--green), #1ab558);
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    transition: opacity 0.1s, transform 0.1s;
+}
+.btn-agp:active { opacity: 0.85; transform: scale(0.98); }
+.btn-agp.danger { background: linear-gradient(135deg, var(--red), #cc3344); font-size: 14px; padding: 10px; }
+
+/* ── MODAL ── */
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    backdrop-filter: blur(3px);
+    padding: 20px;
+}
+.modal-overlay.hidden { display: none; }
+
+.modal-box {
+    background: var(--surface2);
+    width: 100%;
+    max-width: 320px;
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    text-align: center;
+    max-height: 75vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal-box h2 { color: var(--text); font-size: 18px; margin-bottom: 8px; }
+.modal-box p  { color: #bbb; font-size: 14px; line-height: 1.5; margin-bottom: 16px; white-space: pre-wrap; }
+
+.modal-buttons { display: flex; flex-direction: column; gap: 8px; }
+
+.modal-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.1s, transform 0.1s;
+}
+.modal-btn:active { opacity: 0.85; transform: scale(0.97); }
+.btn-primary { background: var(--blue); color: white; }
+.btn-cancel  { background: #444; color: #ccc; }
+</style>
 </head>
 <body>
-    <div class="app-container">
-        
-        <div id="char-creation" class="char-creation-screen">
-            <div class="char-creation-box">
-                <h1>👶 Create Your Character</h1>
-                <input type="text" id="char-name" placeholder="Enter your name" maxlength="20">
-                
-                <div class="gender-select">
-                    <button class="gender-btn male-btn" onclick="ui.selectGender('Male')">👨 Male</button>
-                    <button class="gender-btn female-btn" onclick="ui.selectGender('Female')">👩 Female</button>
-                </div>
-                
-                <button class="btn-start" onclick="ui.startGame()">START LIFE</button>
-                <button class="btn-start" onclick="ui.loadGame()" style="background: #667eea; margin-top: 10px;">LOAD GAME</button>
-            </div>
-        </div>
+<div class="shell">
 
-        <div id="game-screen" class="game-screen hidden">
-        
+    <!-- CHAR CREATION -->
+    <div id="char-creation" class="char-screen">
+        <div class="char-box">
+            <h1>👶 Create Your Character</h1>
+            <input type="text" id="char-name" placeholder="Your name" maxlength="20" autocomplete="off">
+            <div class="gender-row">
+                <button class="gender-btn" onclick="ui.selectGender('Male',this)">👨 Male</button>
+                <button class="gender-btn" onclick="ui.selectGender('Female',this)">👩 Female</button>
+            </div>
+            <button class="btn-main btn-start" onclick="ui.startGame()">▶ START LIFE</button>
+            <button class="btn-main btn-load"  onclick="ui.loadGame()">↩ LOAD GAME</button>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="hidden" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+
         <div class="top-bar">
             <div class="top-info">
-                <span id="header-name">Alex</span>
-                <span id="header-age" class="highlight">Age: 0</span>
+                <span id="header-name">—</span>
+                <span id="header-age">Age: 0</span>
             </div>
             <div class="money-display" id="header-money">$0</div>
         </div>
 
-        <div class="character-area">
-            <div class="avatar-circle" id="avatar-display">👶</div>
-            <div class="status-bars">
-                <div class="bar-row"><span class="icon">❤️</span> <div class="track"><div id="bar-health" class="fill red"></div></div></div>
-                <div class="bar-row"><span class="icon">😄</span> <div class="track"><div id="bar-happy" class="fill orange"></div></div></div>
-                <div class="bar-row"><span class="icon">🧠</span> <div class="track"><div id="bar-smarts" class="fill blue"></div></div></div>
-                <div class="bar-row"><span class="icon">😎</span> <div class="track"><div id="bar-looks" class="fill purple"></div></div></div>
+        <div class="char-area">
+            <div class="avatar" id="avatar-display">👶</div>
+            <div class="bars">
+                <div class="bar-row"><span class="bar-icon">❤️</span><div class="track"><div id="bar-health" class="fill red" style="width:100%"></div></div></div>
+                <div class="bar-row"><span class="bar-icon">😄</span><div class="track"><div id="bar-happy"  class="fill orange" style="width:100%"></div></div></div>
+                <div class="bar-row"><span class="bar-icon">🧠</span><div class="track"><div id="bar-smarts" class="fill blue"   style="width:50%"></div></div></div>
+                <div class="bar-row"><span class="bar-icon">😎</span><div class="track"><div id="bar-looks"  class="fill purple" style="width:50%"></div></div></div>
             </div>
         </div>
 
-        <div id="game-log" class="game-log">
-            <div class="log-entry">Welcome to Life Architect. Your story begins.</div>
+        <div id="game-log" class="log">
+            <div class="entry">Welcome to Life Architect. Your story begins.</div>
         </div>
 
-        <div class="controls-area">
-            <div class="grid-menu">
-                <button onclick="actions.school()">
-                    <div class="btn-icon">📚</div>
-                    <span>School</span>
-                </button>
-                <button onclick="actions.job()">
-                    <div class="btn-icon">💼</div>
-                    <span>Jobs</span>
-                </button>
-                <button onclick="actions.love()">
-                    <div class="btn-icon">💘</div>
-                    <span>Love</span>
-                </button>
-                <button onclick="actions.assets()">
-                    <div class="btn-icon">🏠</div>
-                    <span>Shop</span>
-                </button>
-                <button onclick="actions.activities()">
-                    <div class="btn-icon">🏄</div>
-                    <span>Activities</span>
-                </button>
-                <button onclick="actions.crime()">
-                    <div class="btn-icon">😈</div>
-                    <span>Crime</span>
-                </button>
+        <div class="controls">
+            <div class="grid">
+                <button onclick="actions.school()"><div class="btn-icon">📚</div>School</button>
+                <button onclick="actions.job()">   <div class="btn-icon">💼</div>Jobs</button>
+                <button onclick="actions.love()">  <div class="btn-icon">💘</div>Love</button>
+                <button onclick="actions.assets()"><div class="btn-icon">🏠</div>Shop</button>
+                <button onclick="actions.activities()"><div class="btn-icon">🏄</div>Activities</button>
+                <button onclick="actions.crime()"> <div class="btn-icon">😈</div>Crime</button>
             </div>
-            
-            <button id="btn-age" class="btn-age" onclick="game.ageUp()">+ AGE UP</button>
-            <button class="btn-age" onclick="ui.newGame()" style="background: linear-gradient(180deg, #ff6b6b, #ee5a52); margin-top: 5px;">NEW GAME</button>
+            <button class="btn-agp" onclick="game.ageUp()">+ AGE UP</button>
+            <button class="btn-agp danger" onclick="ui.newGame()">NEW GAME</button>
         </div>
 
         <div id="modal-overlay" class="modal-overlay hidden">
             <div class="modal-box">
                 <h2 id="modal-title">Title</h2>
-                <p id="modal-text">Description text goes here.</p>
-                <div id="modal-buttons" class="modal-buttons">
-                    </div>
+                <p  id="modal-text">Text</p>
+                <div id="modal-buttons" class="modal-buttons"></div>
             </div>
         </div>
 
-        </div>
+    </div><!-- /game-screen -->
+</div><!-- /shell -->
 
-    </div>
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const state = {
+    name:"", gender:"", age:0, money:0, health:100, happiness:100,
+    smarts: Math.floor(Math.random()*50)+20,
+    looks:  Math.floor(Math.random()*60)+20,
+    job:"Unemployed", salary:0, major:null, partner:null,
+    kids:0, pets:[], fame:0, license:null,
+    alive:true, retired:false, history:[], eventQueue:[]
+};
+
+// ─── SAVE ────────────────────────────────────────────────────────────────────
+const save = {
+    save(){ localStorage.setItem('la_save', JSON.stringify(state)); },
+    load(){
+        const s = localStorage.getItem('la_save');
+        if(s){ Object.assign(state, JSON.parse(s)); return true; }
+        return false;
+    },
+    clear(){ localStorage.removeItem('la_save'); location.reload(); }
+};
+
+// ─── GAME ────────────────────────────────────────────────────────────────────
+const game = {
+    start(){
+        if(!state.name || !state.gender) return;
+        document.getElementById('char-creation').style.display = 'none';
+        const gs = document.getElementById('game-screen');
+        gs.classList.remove('hidden');
+        gs.style.display = 'flex';
+        document.getElementById('header-name').innerText = state.name;
+        this.log(`👶 You were born! Welcome, ${state.name}.`, "good");
+        ui.updateAvatar(); ui.render();
+    },
+
+    ageUp(){
+        if(!state.alive) return;
+        state.age++;
+        this.log(`🎂 You turned ${state.age}!`, "good");
+
+        if(state.age === 18 && !state.major){
+            ui.showPopup("College Major","Choose your path:",[
+                {text:"Engineering (+Smarts)", action:()=>{ state.major="Engineering"; state.smarts+=20; game.log("Chose Engineering!"); }},
+                {text:"Business (+Fame)",      action:()=>{ state.major="Business";    state.fame+=10;   game.log("Chose Business!"); }},
+                {text:"Arts (+Looks)",         action:()=>{ state.major="Arts";        state.looks+=15;  game.log("Chose Arts!"); }},
+                {text:"Skip College",          action:()=>{ game.log("Skipped college."); }}
+            ]);
+        }
+        if(state.age >= 65 && !state.retired){
+            state.retired = true; state.salary = 0;
+            this.log("🎉 You retired!", "good");
+        }
+        if(!state.retired && state.salary > 0){
+            let net = Math.floor(state.salary * 0.85);
+            state.money += net;
+            this.log(`💼 Earned $${net.toLocaleString()} from work.`);
+        }
+
+        this.randomEvents();
+
+        if(state.age > 30) state.looks -= 1;
+        if(state.age > 50) state.health -= 2;
+        if(state.age > 70) state.health -= 5;
+
+        if(state.health <= 0){ this.handleDeath(); return; }
+
+        ui.updateAvatar(); ui.render(); ui.scrollBottom();
+        save.save();
+    },
+
+    randomEvents(){
+        state.eventQueue = [];
+        let milestone = false;
+        const M = {6:"🎒 Started Elementary School.",18:"🎓 Graduated High School!",21:"🎉 You're officially an adult!",30:"📊 Welcome to your 30s.",50:"🎂 You hit the big 5-0!"};
+        if(M[state.age]){ state.eventQueue.push({text:M[state.age],type:"good"}); milestone=true; }
+
+        if(!milestone){
+            const R = Math.random;
+            let ev = null;
+            if(R()<0.04&&state.age>30){let a=Math.floor(R()*50000)+10000;ev={text:`💰 Inherited $${a.toLocaleString()}!`,type:"good",e:()=>state.money+=a};}
+            else if(R()<0.03){let a=Math.floor(R()*100000)+50000;ev={text:`🎰 Won lottery! +$${a.toLocaleString()}!`,type:"good",e:()=>state.money+=a};}
+            else if(R()<0.05&&state.age>=10){let l=Math.floor(R()*5000)+1000;ev={text:`💸 Pickpocketed! -$${l}`,type:"bad",e:()=>state.money-=l};}
+            else if(R()<0.07)ev={text:"🚗 Car accident! -15 Health",type:"bad",e:()=>state.health-=15};
+            else if(R()<0.05)ev={text:"🤒 Got the flu! -10 Health",type:"bad",e:()=>state.health-=10};
+            else if(R()<0.04)ev={text:"💪 Started exercise! +20 Health",type:"good",e:()=>state.health+=20};
+            else if(R()<0.03)ev={text:"🏥 Hospital visit! -20 Health -$5k",type:"bad",e:()=>{state.health-=20;state.money-=5000;}};
+            else if(R()<0.06)ev={text:"🎊 Great day at work! +15 Happiness",type:"good",e:()=>state.happiness+=15};
+            else if(R()<0.05)ev={text:"😞 Terrible day... -15 Happiness",type:"bad",e:()=>state.happiness-=15};
+            else if(R()<0.04)ev={text:"📸 Went viral! +5 Fame",type:"good",e:()=>state.fame+=5};
+            else if(R()<0.03)ev={text:"🌟 Became famous! +10 Fame +20 Happy",type:"good",e:()=>{state.fame+=10;state.happiness+=20;}};
+            else if(R()<0.03)ev={text:"📚 Learned something new! +5 Smarts",type:"good",e:()=>state.smarts+=5};
+            else if(state.partner&&state.age>25&&state.kids<3&&R()<0.08)ev={text:"👶 You had a baby! +30 Happy -$5k",type:"good",e:()=>{state.kids++;state.happiness+=30;state.money-=5000;}};
+            else if(state.partner&&R()<0.02)ev={text:"💔 Relationship ended! -30 Happy",type:"bad",e:()=>{state.partner=null;state.happiness-=30;}};
+            else if(R()<0.02)ev={text:"🎁 Found $1000 on the street!",type:"good",e:()=>state.money+=1000};
+            else if(R()<0.03)ev={text:"💇 Makeover! +3 Looks",type:"good",e:()=>state.looks+=3};
+            else if(R()<0.02&&state.salary>0)ev={text:"💼 Work bonus! +$500",type:"good",e:()=>state.money+=500};
+            else if(R()<0.015)ev={text:"🧘 Yoga session! +15 Health",type:"good",e:()=>state.health+=15};
+            if(ev){ if(ev.e) ev.e(); state.eventQueue.push({text:ev.text,type:ev.type}); }
+        }
+        state.eventQueue.forEach(e=>this.log(e.text,e.type));
+    },
+
+    handleDeath(){
+        state.alive = false;
+        let cause = state.age>=100?"extreme old age":state.age>=80?"old age":state.age<20?"a tragic accident":"natural causes";
+        ui.showPopup("💀 Game Over",
+            `You died at age ${state.age} from ${cause}.\n\nNet Worth: $${Math.max(0,state.money).toLocaleString()}\nKids: ${state.kids} | Fame: ${state.fame}`,
+            [{text:"Play Again", action:()=>location.reload()}]);
+    },
+
+    log(msg, type="neutral"){ ui.addLog(msg, type); }
+};
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+const actions = {
+    job(){
+        if(state.age<16) return ui.showPopup("Too Young","Must be 16 to work!",[{text:"OK",action:null}]);
+        const jobs=[
+            {name:"Janitor",salary:20000},
+            {name:"Barista",salary:25000},
+            {name:"Teacher",salary:50000,req:()=>state.smarts>=60},
+            {name:"Software Engineer",salary:120000,req:()=>state.smarts>=80},
+            {name:"Doctor",salary:200000,req:()=>state.smarts>=90},
+            {name:"CEO",salary:250000,req:()=>state.fame>=30},
+            {name:"Actor",salary:150000,req:()=>state.looks>=80}
+        ];
+        ui.showPopup("Career","Choose a job:", [
+            ...jobs.map(j=>({
+                text:`${j.name} ($${j.salary/1000}k/yr)`,
+                action:()=>{
+                    if(j.req&&!j.req()) return game.log("You don't meet the requirements!","bad");
+                    state.job=j.name; state.salary=j.salary;
+                    game.log(`Hired as ${j.name}!`,"good");
+                }
+            })),
+            {text:"Cancel",action:null}
+        ]);
+    },
+
+    school(){
+        ui.showPopup("Education","What to study?",[
+            {text:"University ($30k)", action:()=>this._university()},
+            {text:"Study Hard (Free)", action:()=>this._study()},
+            {text:"Cancel",action:null}
+        ]);
+    },
+
+    _university(){
+        if(state.age<18) return game.log("Must be 18 for university!","bad");
+        if(state.money<30000) return game.log("Not enough money!","bad");
+        const O=[
+            ()=>{state.money-=30000;state.smarts+=25;state.fame+=5;game.log("🎓 Graduated with honors! +25 Smarts","good");},
+            ()=>{state.money-=30000;state.smarts+=15;game.log("📚 Got your degree! +15 Smarts","good");},
+            ()=>{state.money-=30000;state.smarts+=10;state.happiness-=30;game.log("😫 Finished but miserable. +10 Smarts -30 Happy","neutral");},
+            ()=>{state.money-=30000;state.smarts-=5;game.log("🤦 Dropped out! -5 Smarts","bad");},
+            ()=>{state.money-=30000;state.smarts+=30;state.fame+=10;game.log("🌟 Top of class! +30 Smarts +10 Fame","good");},
+            ()=>{state.money-=30000;state.smarts+=20;state.partner="College Sweetheart";state.happiness+=30;game.log("💕 Met your soulmate! +20 Smarts +30 Happy","good");},
+            ()=>{state.money-=30000;state.smarts+=18;state.money+=50000;game.log("💼 Internship → job offer! +18 Smarts +$50k","good");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    _study(){
+        const O=[
+            ()=>{state.smarts+=10;state.health-=5;game.log("📖 Studied hard. +10 Smarts -5 Health","good");},
+            ()=>{state.smarts+=8;game.log("✏️ Good session. +8 Smarts","good");},
+            ()=>{state.smarts+=15;state.happiness+=10;game.log("🧠 Felt smart! +15 Smarts +10 Happy","good");},
+            ()=>{state.smarts+=1;game.log("😴 Fell asleep. +1 Smarts","bad");},
+            ()=>{state.smarts+=20;state.looks-=5;game.log("🤓 Ultra focused! +20 Smarts -5 Looks","neutral");},
+            ()=>{state.smarts-=2;game.log("🎮 Got distracted. -2 Smarts","bad");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    love(){
+        if(state.age<16) return ui.showPopup("Too Young","Wait until 16.",[{text:"OK",action:null}]);
+        const names=["Alex","Sam","Jordan","Casey","Riley","Morgan","Taylor","Quinn"];
+        const lover={name:names[Math.floor(Math.random()*names.length)],look:Math.floor(Math.random()*100)};
+        ui.showPopup("Dating App",`Matched with ${lover.name}. Looks: ${lover.look}%`,[
+            {text:"Ask Out 💘",action:()=>this._askOut(lover)},
+            {text:"Swipe Left ❌",action:()=>game.log("Stayed single.")}
+        ]);
+    },
+
+    _askOut(lover){
+        const O=[
+            ()=>{state.partner=lover.name;state.happiness+=25;game.log(`✨ ${lover.name} said YES! +25 Happy`,"good");},
+            ()=>{state.happiness-=15;game.log(`😢 ${lover.name} rejected you. -15 Happy`,"bad");},
+            ()=>{state.happiness-=25;game.log(`😳 ${lover.name} blocked you! -25 Happy`,"bad");},
+            ()=>{state.partner=lover.name;state.happiness+=30;state.fame+=3;game.log(`🌟 ${lover.name} thinks you're amazing! +30 Happy`,"good");},
+            ()=>{state.partner=lover.name;state.happiness+=15;game.log(`😊 ${lover.name} gave you a chance. +15 Happy`,"good");},
+            ()=>{state.health+=10;state.happiness+=35;state.partner=lover.name;game.log(`🚀 Life-changing romance! +35 Happy +10 Health`,"good");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    crime(){
+        if(state.age<16) return ui.showPopup("Too Young","Must be 16.",[{text:"OK",action:null}]);
+        ui.showPopup("Crime","What's your move?",[
+            {text:"Rob House",     action:()=>this._rob()},
+            {text:"Pickpocket",    action:()=>this._pick()},
+            {text:"Cancel",action:null}
+        ]);
+    },
+
+    _rob(){
+        const O=[
+            ()=>{state.money+=10000;game.log("💰 Robbed a mansion! +$10k","good");},
+            ()=>{state.money+=5000;game.log("💼 Broke into apartment. +$5k","good");},
+            ()=>{state.money-=5000;state.happiness-=30;state.job="Unemployed";game.log("🚨 Caught! Prison & fired. -$5k -30 Happy","bad");},
+            ()=>{state.health-=20;game.log("🔫 Shot by security! -20 Health","bad");},
+            ()=>{state.money+=20000;state.fame+=10;game.log("🌟 Heist of century! +$20k +10 Fame","good");},
+            ()=>{state.money-=10000;state.happiness-=50;game.log("😱 Alarm! Arrested! -$10k -50 Happy","bad");},
+            ()=>{state.money+=15000;state.happiness+=20;game.log("😎 Smooth criminal. +$15k +20 Happy","good");},
+            ()=>{state.health-=25;game.log("💀 Nearly died! -25 Health","bad");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    _pick(){
+        const O=[
+            ()=>{state.money+=500;game.log("👜 Smooth. +$500","good");},
+            ()=>{state.money+=1000;game.log("💼 Fat wallet! +$1000","good");},
+            ()=>{state.money-=200;state.happiness-=20;game.log("😬 Caught! -$200 -20 Happy","bad");},
+            ()=>{state.money+=2000;game.log("🍀 Jackpot! +$2000","good");},
+            ()=>{state.money-=1000;game.log("🚨 Arrested! -$1000 bail","bad");},
+            ()=>{state.money+=800;game.log("💰 Nice score! +$800","good");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    assets(){
+        ui.showPopup("🛍️ Shop","What to buy?",[
+            {text:"🎫 Driver License ($200)", action:()=>{
+                if(state.age<16) return game.log("Too young!","bad");
+                if(state.license) return game.log("Already have one!","bad");
+                if(state.money<200) return game.log("Not enough money!","bad");
+                ui.showPopup("Driving Test","70% chance of passing.",[
+                    {text:"Take Test", action:()=>{
+                        if(Math.random()<0.7){state.license="Driver's License";state.money-=200;game.log("✅ Passed! Got license!","good");}
+                        else game.log("❌ Failed. Try again.","bad");
+                    }},
+                    {text:"Cancel",action:null}
+                ]);
+            }},
+            {text:"🚗 Car ($25k)", action:()=>{
+                if(!state.license) return game.log("Need license first!","bad");
+                if(state.money<25000) return game.log("Not enough money!","bad");
+                state.money-=25000; game.log("🚗 Got a car!","good");
+            }},
+            {text:"🏠 House ($100k)", action:()=>{
+                if(state.money<100000) return game.log("Not enough money!","bad");
+                state.money-=100000; game.log("🏠 Bought a house!","good");
+            }},
+            {text:"🐕 Dog ($2k)", action:()=>{
+                if(state.money<2000) return game.log("Not enough money!","bad");
+                state.money-=2000; state.pets.push("Dog"); state.happiness+=10;
+                game.log("🐕 Got a dog! +10 Happy","good");
+            }},
+            {text:"Cancel",action:null}
+        ]);
+    },
+
+    activities(){
+        ui.showPopup("Activities","What to do?",[
+            {text:"🎉 Party",             action:()=>this._party()},
+            {text:"🏋️ Gym",               action:()=>this._gym()},
+            {text:"💉 Plastic Surgery ($5k)", action:()=>this._surgery()},
+            {text:"🧠 Therapy ($2k)",     action:()=>this._therapy()},
+            {text:"Cancel",action:null}
+        ]);
+    },
+
+    _party(){
+        if(state.age<16) return game.log("Too young to party!","bad");
+        const O=[
+            ()=>{state.happiness+=20;state.health-=5;game.log("🎉 Epic party! +20 Happy -5 Health","good");},
+            ()=>{state.happiness+=15;game.log("🎊 Great time! +15 Happy","good");},
+            ()=>{state.happiness-=10;game.log("😢 Lame party. -10 Happy","bad");},
+            ()=>{state.health-=10;state.happiness-=10;game.log("🤮 Terrible hangover. -10 Health -10 Happy","bad");},
+            ()=>{state.happiness+=25;state.fame+=5;game.log("⭐ Everyone loved you! +25 Happy +5 Fame","good");},
+            ()=>{state.happiness+=30;state.fame+=3;game.log("🎤 Killed karaoke! +30 Happy +3 Fame","good");},
+            ()=>{state.money-=200;state.happiness-=20;game.log("🚨 Arrested! -$200 -20 Happy","bad");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    _gym(){
+        const O=[
+            ()=>{state.health+=20;state.looks+=2;game.log("💪 Killer workout! +20 Health +2 Looks","good");},
+            ()=>{state.health+=15;game.log("🏋️ Good session. +15 Health","good");},
+            ()=>{state.health-=10;game.log("🤯 Injured lifting heavy! -10 Health","bad");},
+            ()=>{state.health+=25;state.happiness+=10;game.log("⚡ Best workout ever! +25 Health +10 Happy","good");},
+            ()=>{state.looks+=5;state.health+=18;game.log("🔥 Getting shredded! +5 Looks +18 Health","good");},
+            ()=>{state.health-=20;game.log("😵 Dehydrated and collapsed! -20 Health","bad");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    _surgery(){
+        if(state.age<18) return game.log("Must be 18!","bad");
+        if(state.money<5000) return game.log("Not enough money!","bad");
+        const O=[
+            ()=>{state.money-=5000;state.looks=100;state.happiness+=30;game.log("✨ Stunning! Looks: MAX +30 Happy","good");},
+            ()=>{state.money-=5000;state.looks=95;state.happiness+=25;game.log("💫 Excellent results! +25 Happy","good");},
+            ()=>{state.money-=5000;state.looks=75;state.happiness-=20;game.log("😬 Botched job! -20 Happy","bad");},
+            ()=>{state.money-=5000;state.looks=60;state.happiness-=30;game.log("😱 Terrible! What happened?! -30 Happy","bad");},
+            ()=>{state.money-=5000;state.looks=90;state.happiness+=20;state.fame+=5;game.log("🌟 Instant fame! +20 Happy +5 Fame","good");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    },
+
+    _therapy(){
+        if(state.age<13) return game.log("Must be 13!","bad");
+        if(state.money<2000) return game.log("Not enough money!","bad");
+        const O=[
+            ()=>{state.money-=2000;state.happiness=100;game.log("😌 Feel amazing! Happiness: MAX","good");},
+            ()=>{state.money-=2000;state.happiness+=30;game.log("☺️ Great session! +30 Happy","good");},
+            ()=>{state.money-=2000;state.happiness-=5;game.log("😒 Therapist sucks. -5 Happy","bad");},
+            ()=>{state.money-=2000;state.happiness+=40;state.smarts+=5;game.log("🧠 Real insights! +40 Happy +5 Smarts","good");},
+            ()=>{state.money-=2000;state.happiness+=50;game.log("✨ Life-changing session! +50 Happy","good");}
+        ];
+        O[Math.floor(Math.random()*O.length)]();
+    }
+};
+
+// ─── UI ──────────────────────────────────────────────────────────────────────
+const ui = {
+    _gender: null,
+
+    selectGender(g, btn){
+        this._gender = g;
+        document.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state.gender = g;
+    },
+
+    startGame(){
+        const name = document.getElementById('char-name').value.trim();
+        if(!name || !this._gender){ alert("Enter a name and pick a gender!"); return; }
+        if(name.length > 20){ alert("Name too long!"); return; }
+        if(!/^[a-zA-Z0-9\s\-']+$/.test(name)){ alert("Name has invalid characters."); return; }
+        const bad=["ass","shit","fuck","bitch","damn","hell","cunt","dick","pussy","whore","slut","nigga","nigger","faggot","retard","piss","cock","twat","bastard"];
+        if(bad.some(w=>name.toLowerCase().includes(w))){ alert("Inappropriate name."); document.getElementById('char-name').value=""; return; }
+        state.name=name; state.gender=this._gender;
+        game.start(); save.save();
+    },
+
+    loadGame(){
+        if(!save.load()){ alert("No save found!"); return; }
+        document.getElementById('char-creation').style.display='none';
+        const gs=document.getElementById('game-screen');
+        gs.classList.remove('hidden'); gs.style.display='flex';
+        document.getElementById('header-name').innerText=state.name;
+        this.render(); this.updateAvatar(); this.scrollBottom();
+    },
+
+    newGame(){ save.clear(); },
+
+    render(){
+        state.health    = Math.max(0, Math.min(100, state.health));
+        state.happiness = Math.max(0, Math.min(100, state.happiness));
+        state.smarts    = Math.max(0, Math.min(100, state.smarts));
+        state.looks     = Math.max(0, Math.min(100, state.looks));
+        state.money     = Math.max(0, state.money);
+        state.fame      = Math.max(0, state.fame);
+
+        document.getElementById('header-age').innerText   = `Age: ${state.age}`;
+        document.getElementById('header-money').innerText = `$${state.money.toLocaleString()}`;
+        document.getElementById('bar-health').style.width  = state.health    + '%';
+        document.getElementById('bar-happy').style.width   = state.happiness + '%';
+        document.getElementById('bar-smarts').style.width  = state.smarts    + '%';
+        document.getElementById('bar-looks').style.width   = state.looks     + '%';
+    },
+
+    updateAvatar(){
+        const el = document.getElementById('avatar-display');
+        const a=state.age, m=state.gender==='Male';
+        el.innerText = a<5?'👶':a<13?(m?'👦':'👧'):a<25?(m?'🧑':'👩'):a<60?(m?'👨':'👩'):(m?'👴':'👵');
+    },
+
+    addLog(text, type){
+        const log = document.getElementById('game-log');
+        const e = document.createElement('div');
+        e.className = `entry ${type}`;
+        e.innerHTML = `<b>${state.age}y:</b> ${text}`;
+        log.appendChild(e);
+        // keep max 40 entries
+        while(log.children.length > 40) log.removeChild(log.firstChild);
+        log.scrollTop = log.scrollHeight;
+        this._beep();
+    },
+
+    scrollBottom(){
+        const log=document.getElementById('game-log');
+        setTimeout(()=>log.scrollTop=log.scrollHeight,10);
+    },
+
+    _beep(){
+        try{
+            const a=new(window.AudioContext||window.webkitAudioContext)();
+            const o=a.createOscillator(), g=a.createGain();
+            o.connect(g); g.connect(a.destination);
+            o.frequency.value=800; o.type='sine';
+            g.gain.setValueAtTime(0.06,a.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.1);
+            o.start(a.currentTime); o.stop(a.currentTime+0.1);
+        }catch(e){}
+    },
+
+    showPopup(title, text, buttons){
+        const ov=document.getElementById('modal-overlay');
+        document.getElementById('modal-title').innerText=title;
+        document.getElementById('modal-text').innerText=text;
+        const bc=document.getElementById('modal-buttons');
+        bc.innerHTML='';
+        buttons.forEach(b=>{
+            const btn=document.createElement('button');
+            btn.innerText=b.text;
+            btn.className='modal-btn '+(b.text.includes('Cancel')||b.text==='OK'?'btn-cancel':'btn-primary');
+            btn.onclick=()=>{
+                if(b.action) b.action();
+                ov.classList.add('hidden');
+                ui.render();
+            };
+            bc.appendChild(btn);
+        });
+        ov.classList.remove('hidden');
+    }
+};
+</script>
 </body>
 </html>
